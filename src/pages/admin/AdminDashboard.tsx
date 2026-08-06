@@ -117,7 +117,7 @@ export default function AdminDashboard() {
                     <td className="p-4">
                       <a href={`/review/${clinic.qr_identifier}`} target="_blank" rel="noreferrer" className="text-primary hover:underline flex items-center text-sm font-medium">
                         <LinkIcon className="h-4 w-4 mr-1" />
-                        /review/{clinic.qr_identifier}
+                        {window.location.origin}/review/{clinic.qr_identifier}
                       </a>
                     </td>
                   </tr>
@@ -140,8 +140,8 @@ export default function AdminDashboard() {
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">Clinic Created!</h2>
                 <p className="text-gray-600 mb-6">You can now generate a QR code for the link below.</p>
                 <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 flex items-center justify-between">
-                  <span className="font-mono text-primary font-bold">http://localhost:5173/review/{createdClinic.qr_identifier}</span>
-                  <button onClick={() => navigator.clipboard.writeText(`http://localhost:5173/review/${createdClinic.qr_identifier}`)} className="text-sm bg-white border px-3 py-1 rounded-lg hover:bg-gray-50 text-gray-700">Copy Link</button>
+                  <span className="font-mono text-primary font-bold">{window.location.origin}/review/{createdClinic.qr_identifier}</span>
+                  <button onClick={() => navigator.clipboard.writeText(`${window.location.origin}/review/${createdClinic.qr_identifier}`)} className="text-sm bg-white border px-3 py-1 rounded-lg hover:bg-gray-50 text-gray-700">Copy Link</button>
                 </div>
                 <button onClick={() => setCreatedClinic(null)} className="mt-8 text-primary font-medium hover:underline">Add another clinic</button>
               </div>
