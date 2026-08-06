@@ -29,7 +29,7 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-      const res = await axios.get(`${API_URL}/api/v1/management/`);
+      const res = await axios.get(`${API_URL}/api/v1/management/?t=${new Date().getTime()}`);
       setClinics(res.data);
     } catch (err) {
       console.error(err);
