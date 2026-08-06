@@ -19,6 +19,7 @@ export default function AdminDashboard() {
   // Form State
   const [formData, setFormData] = useState({
     name: '',
+    logo_url: '',
     category: 'Dentist',
     google_review_url: '',
     theme_color: '#0ea5e9'
@@ -51,7 +52,7 @@ export default function AdminDashboard() {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
       const res = await axios.post(`${API_URL}/api/v1/management/`, formData);
       setCreatedClinic(res.data);
-      setFormData({ name: '', category: 'Dentist', google_review_url: '', theme_color: '#0ea5e9' });
+      setFormData({ name: '', logo_url: '', category: 'Dentist', google_review_url: '', theme_color: '#0ea5e9' });
     } catch (err) {
       alert("Failed to create clinic. Make sure the backend is running and the database is connected.");
     } finally {
@@ -161,6 +162,11 @@ export default function AdminDashboard() {
                     <option value="Dentist">Dentist</option>
                     <option value="General Hospital">General Hospital</option>
                   </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Logo URL (Optional)</label>
+                  <input type="url" value={formData.logo_url || ''} onChange={e => setFormData({...formData, logo_url: e.target.value})} className="w-full border-gray-300 rounded-xl shadow-sm focus:ring-primary focus:border-primary p-3 bg-gray-50" placeholder="https://example.com/logo.png" />
                 </div>
 
                 <div>
