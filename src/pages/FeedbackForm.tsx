@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Send } from 'lucide-react';
+import { Send, Languages } from 'lucide-react';
 import axios from 'axios';
 
 interface Props {
@@ -7,6 +7,44 @@ interface Props {
   questions: string[];
   onComplete: (result: any) => void;
 }
+
+const TRANSLATIONS: Record<string, Record<'en'|'te', string>> = {
+  "Poor": { en: "Poor", te: "బాగాలేదు" },
+  "Fair": { en: "Fair", te: "పర్వాలేదు" },
+  "Average": { en: "Average", te: "సాధారణం" },
+  "Happy": { en: "Happy", te: "బాగుంది" },
+  "Excellent": { en: "Excellent", te: "చాలా బాగుంది" },
+  "How can we improve?": { en: "How can we improve?", te: "మేము ఎలా మెరుగవ్వగలం?" },
+  "Tell us what went wrong...": { en: "Tell us what went wrong...", te: "సమస్య ఏమిటో దయచేసి వివరించండి..." },
+  "Submit Feedback": { en: "Submit Feedback", te: "ఫీడ్‌బ్యాక్ సమర్పించండి" },
+  "Please answer all questions": { en: "Please answer all questions", te: "దయచేసి అన్ని ప్రశ్నలకు సమాధానం ఇవ్వండి" },
+  "Submitting...": { en: "Submitting...", te: "సమర్పిస్తోంది..." },
+  // IVF
+  "Did you feel fully supported by our fertility specialists during your visit?": { en: "Did you feel fully supported by our fertility specialists during your visit?", te: "మీ సందర్శన సమయంలో మా ఫెర్టిలిటీ స్పెషలిస్ట్‌ల నుండి మీకు పూర్తి మద్దతు లభించిందా?" },
+  "Were our staff empathetic and clear about your treatment options?": { en: "Were our staff empathetic and clear about your treatment options?", te: "మా సిబ్బంది మీ చికిత్స ఎంపికల గురించి స్పష్టంగా వివరించారా?" },
+  "Did you feel comfortable asking questions during your consultation?": { en: "Did you feel comfortable asking questions during your consultation?", te: "సంప్రదింపుల సమయంలో ప్రశ్నలు అడగడానికి మీరు సౌకర్యంగా భావించారా?" },
+  "Was the facility clean, private, and comfortable for you?": { en: "Was the facility clean, private, and comfortable for you?", te: "ఆసుపత్రి శుభ్రంగా, ప్రైవేట్‌గా మరియు మీకు సౌకర్యంగా ఉందా?" },
+  // Dermatology
+  "Were you satisfied with your consultation and skin treatment plan?": { en: "Were you satisfied with your consultation and skin treatment plan?", te: "మీరు సంప్రదింపులు మరియు చర్మ చికిత్స ప్రణాళికతో సంతృప్తి చెందారా?" },
+  "Did the doctor explain the procedures and expected outcomes clearly?": { en: "Did the doctor explain the procedures and expected outcomes clearly?", te: "వైద్యులు విధానాలు మరియు ఆశించిన ఫలితాలను స్పష్టంగా వివరించారా?" },
+  "Was the clinic environment welcoming and hygienic?": { en: "Was the clinic environment welcoming and hygienic?", te: "క్లినిక్ వాతావరణం ఆహ్వానించదగినదిగా మరియు పరిశుభ్రంగా ఉందా?" },
+  "Was it easy to schedule and check-in for your appointment?": { en: "Was it easy to schedule and check-in for your appointment?", te: "మీ అపాయింట్‌మెంట్ షెడ్యూల్ చేయడం మరియు చెక్-ఇన్ చేయడం సులభంగా ఉందా?" },
+  // Gynecology
+  "Did you feel that your privacy and comfort were respected during your visit?": { en: "Did you feel that your privacy and comfort were respected during your visit?", te: "మీ సందర్శన సమయంలో మీ గోప్యత మరియు సౌకర్యానికి గౌరవం లభించిందని మీరు భావించారా?" },
+  "Did the doctor address all your concerns regarding women's health?": { en: "Did the doctor address all your concerns regarding women's health?", te: "మహిళల ఆరోగ్యానికి సంబంధించి మీ ఆందోళనలన్నింటినీ వైద్యులు పరిష్కరించారా?" },
+  "Was the nursing staff supportive and gentle?": { en: "Was the nursing staff supportive and gentle?", te: "నర్సింగ్ సిబ్బంది మద్దతుగా మరియు మృదువుగా ఉన్నారా?" },
+  "Would you recommend our facility to your friends and family?": { en: "Would you recommend our facility to your friends and family?", te: "మీరు మా ఆసుపత్రిని మీ స్నేహితులు మరియు కుటుంబ సభ్యులకు సిఫార్సు చేస్తారా?" },
+  // Dentist
+  "Did the dentist make sure you were comfortable during the procedure?": { en: "Did the dentist make sure you were comfortable during the procedure?", te: "చికిత్స సమయంలో మీరు సౌకర్యంగా ఉండేలా దంతవైద్యులు చూసుకున్నారా?" },
+  "Was the clinic environment clean and welcoming?": { en: "Was the clinic environment clean and welcoming?", te: "క్లినిక్ వాతావరణం శుభ్రంగా మరియు ఆహ్వానించదగినదిగా ఉందా?" },
+  "Did the dentist explain the treatment plan clearly?": { en: "Did the dentist explain the treatment plan clearly?", te: "దంతవైద్యులు చికిత్స ప్రణాళికను స్పష్టంగా వివరించారా?" },
+  "Were our front-desk staff polite and helpful?": { en: "Were our front-desk staff polite and helpful?", te: "మా ఫ్రంట్-డెస్క్ సిబ్బంది మర్యాదగా మరియు సహాయకారిగా ఉన్నారా?" },
+  // General Hospital
+  "Were you seen by a doctor within a reasonable waiting time?": { en: "Were you seen by a doctor within a reasonable waiting time?", te: "తక్కువ నిరీక్షణ సమయంలో మీరు వైద్యునిచే చూడబడ్డారా?" },
+  "Did you feel well taken care of by the nursing and medical staff?": { en: "Did you feel well taken care of by the nursing and medical staff?", te: "నర్సింగ్ మరియు వైద్య సిబ్బంది మిమ్మల్ని బాగా చూసుకున్నారని మీరు భావించారా?" },
+  "Was the admission and discharge process smooth?": { en: "Was the admission and discharge process smooth?", te: "అడ్మిషన్ మరియు డిశ్చార్జ్ ప్రక్రియ సజావుగా జరిగిందా?" },
+  "Did you find the hospital rooms and facilities completely clean?": { en: "Did you find the hospital rooms and facilities completely clean?", te: "ఆసుపత్రి గదులు మరియు సౌకర్యాలు పూర్తిగా శుభ్రంగా ఉన్నాయా?" }
+};
 
 const FaceIcon = ({ type, active }: { type: 1|2|3|4|5, active: boolean }) => {
   const configs = {
@@ -38,9 +76,12 @@ const RATING_OPTIONS = [
 ];
 
 export default function FeedbackForm({ clinicId, questions, onComplete }: Props) {
+  const [lang, setLang] = useState<'en'|'te'>('en');
   const [privateFeedback, setPrivateFeedback] = useState('');
   const [loading, setLoading] = useState(false);
   const [answers, setAnswers] = useState<Record<number, number>>({});
+
+  const t = (text: string) => TRANSLATIONS[text]?.[lang] || text;
 
   const handleAnswer = (idx: number, value: number) => {
     setAnswers(prev => ({ ...prev, [idx]: value }));
@@ -100,12 +141,23 @@ export default function FeedbackForm({ clinicId, questions, onComplete }: Props)
   return (
     <div className="flex flex-col flex-1 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-md mx-auto w-full">
       
+      {/* Language Toggle */}
+      <div className="flex justify-end mb-4 px-1">
+        <button 
+          onClick={() => setLang(lang === 'en' ? 'te' : 'en')}
+          className="flex items-center text-sm font-bold text-gray-500 hover:text-primary transition-colors bg-white px-3 py-1.5 rounded-full shadow-sm border border-gray-100"
+        >
+          <Languages className="w-4 h-4 mr-1.5" />
+          {lang === 'en' ? 'తెలుగు' : 'English'}
+        </button>
+      </div>
+
       {/* Questions List (Faces) */}
       {questions.length > 0 && (
         <div className="mb-6 space-y-5">
             {questions.map((q, idx) => (
                 <div key={idx} className="bg-white p-6 rounded-3xl border border-gray-100/60 shadow-[0_4px_20px_rgb(0,0,0,0.03)] transition-all hover:shadow-[0_4px_20px_rgb(0,0,0,0.06)]">
-                    <p className="text-[15px] text-gray-700 font-semibold mb-5 leading-snug">{q}</p>
+                    <p className="text-[15px] text-gray-700 font-semibold mb-5 leading-snug">{t(q)}</p>
                     <div className="flex justify-between items-center px-1">
                         {RATING_OPTIONS.map((opt) => {
                           const isSelected = answers[idx] === opt.value;
@@ -117,7 +169,7 @@ export default function FeedbackForm({ clinicId, questions, onComplete }: Props)
                             >
                                 <FaceIcon type={opt.value as 1|2|3|4|5} active={isSelected} />
                                 <span className={`text-[11px] mt-2 font-semibold transition-colors duration-200 ${isSelected ? 'text-gray-800' : 'text-gray-400'}`}>
-                                  {opt.label}
+                                  {t(opt.label)}
                                 </span>
                             </button>
                           );
@@ -132,14 +184,14 @@ export default function FeedbackForm({ clinicId, questions, onComplete }: Props)
       {averageRating > 0 && averageRating <= 3 && (
         <div className="mb-8 animate-in fade-in slide-in-from-top-4">
           <label className="block text-sm font-bold text-gray-700 mb-3 ml-1">
-            How can we improve?
+            {t("How can we improve?")}
           </label>
           <textarea
             value={privateFeedback}
             onChange={(e) => setPrivateFeedback(e.target.value)}
             className="w-full border-2 border-gray-100 rounded-3xl focus:ring-0 focus:border-primary p-5 bg-white shadow-[0_4px_20px_rgb(0,0,0,0.02)] transition-all resize-none text-gray-700 placeholder-gray-400"
             rows={4}
-            placeholder="Tell us what went wrong..."
+            placeholder={t("Tell us what went wrong...")}
           />
         </div>
       )}
@@ -153,11 +205,11 @@ export default function FeedbackForm({ clinicId, questions, onComplete }: Props)
           {loading ? (
             <span className="animate-pulse flex items-center">
                <div className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin mr-2"></div>
-               Submitting...
+               {t("Submitting...")}
             </span>
           ) : (
             <>
-              <span className="text-[15px]">{allQuestionsAnswered ? 'Submit Feedback' : 'Please answer all questions'}</span>
+              <span className="text-[15px]">{allQuestionsAnswered ? t("Submit Feedback") : t("Please answer all questions")}</span>
               <Send className="ml-2 h-5 w-5" />
             </>
           )}
