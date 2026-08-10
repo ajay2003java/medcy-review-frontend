@@ -63,11 +63,11 @@ function ClinicFlowWrapper() {
 
       const demoServices: Record<string, string[]> = {
         'IVF': [
-          "Intra Uterine Insemination (IUI)",
-          "In Vitro Fertilization (IVF)",
-          "Intra Cytoplasmic Sperm Injection (ICSI)",
-          "Intra Cytoplasmic Morphologic Sperm Injection (IMSI)",
-          "Testicular Sperm Aspiration/Extraction (TESA/TESE)",
+          "IUI",
+          "IVF",
+          "ICSI",
+          "IMSI",
+          "TESA/TESE",
           "Oocyte Freezing",
           "Semen Banking",
           "Assisted Hatching",
@@ -111,11 +111,11 @@ function ClinicFlowWrapper() {
         if (!data.services || data.services.length === 0) {
           const fallbackServices: Record<string, string[]> = {
             'IVF': [
-              "Intra Uterine Insemination (IUI)",
-              "In Vitro Fertilization (IVF)",
-              "Intra Cytoplasmic Sperm Injection (ICSI)",
-              "Intra Cytoplasmic Morphologic Sperm Injection (IMSI)",
-              "Testicular Sperm Aspiration/Extraction (TESA/TESE)",
+              "IUI",
+              "IVF",
+              "ICSI",
+              "IMSI",
+              "TESA/TESE",
               "Oocyte Freezing",
               "Semen Banking",
               "Assisted Hatching",
