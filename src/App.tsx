@@ -123,9 +123,10 @@ function ClinicFlowWrapper() {
 
       {/* Main Content Area */}
       <div className="flex-1 p-6 flex flex-col relative z-0">
-        {step === 'welcome' && (
+        {step === 'welcome' && clinicData && (
           <WelcomeScreen
-            onStart={() => setStep('feedback')}
+            onNext={() => setStep('feedback')}
+            clinicName={clinicData.name}
           />
         )}
         {step === 'feedback' && (
