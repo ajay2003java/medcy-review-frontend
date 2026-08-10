@@ -203,25 +203,23 @@ export default function FeedbackForm({ clinicId, questions, services = [], onCom
         </div>
       )}
 
-      {/* Services Selection (Only shown if all questions answered and average rating > 3) */}
-      {allQuestionsAnswered && averageRating > 3 && services && services.length > 0 && (
-        <div className="mb-8 animate-in fade-in slide-in-from-bottom-4">
-          <label className="block text-[15px] font-bold text-gray-700 mb-4 ml-1">
-            {t("Which service did you receive?")}
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {services.map((service, idx) => (
-              <button
-                key={idx}
-                onClick={() => setSelectedService(service)}
-                className={`px-4 py-2.5 rounded-2xl text-sm font-semibold transition-all border-2 ${selectedService === service ? 'bg-primary border-primary text-white shadow-md shadow-primary/20 scale-[1.02]' : 'bg-white border-gray-100 text-gray-600 hover:border-gray-200 hover:bg-gray-50'}`}
-              >
-                {service}
-              </button>
-            ))}
-          </div>
+      {/* Services Selection (Always shown) */}
+      <div className="mb-8 animate-in fade-in slide-in-from-bottom-4">
+        <label className="block text-[15px] font-bold text-gray-700 mb-4 ml-1">
+          {t("Which service did you receive?")}
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {(services && services.length > 0 ? services : ["General Consultation", "Specialist Visit", "Follow-up", "Other"]).map((service, idx) => (
+            <button
+              key={idx}
+              onClick={() => setSelectedService(service)}
+              className={`px-4 py-2.5 rounded-2xl text-sm font-semibold transition-all border-2 ${selectedService === service ? 'bg-primary border-primary text-white shadow-md shadow-primary/20 scale-[1.02]' : 'bg-white border-gray-100 text-gray-600 hover:border-gray-200 hover:bg-gray-50'}`}
+            >
+              {service}
+            </button>
+          ))}
         </div>
-      )}
+      </div>
 
       <div className="mt-auto pt-4 pb-8">
         <button
