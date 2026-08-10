@@ -62,7 +62,20 @@ function ClinicFlowWrapper() {
       };
 
       const demoServices: Record<string, string[]> = {
-        'IVF': ["IVF Treatment", "IUI Treatment", "ICSI", "Egg Freezing", "Fertility Checkup"],
+        'IVF': [
+          "Intra Uterine Insemination (IUI)",
+          "In Vitro Fertilization (IVF)",
+          "Intra Cytoplasmic Sperm Injection (ICSI)",
+          "Intra Cytoplasmic Morphologic Sperm Injection (IMSI)",
+          "Testicular Sperm Aspiration/Extraction (TESA/TESE)",
+          "Oocyte Freezing",
+          "Semen Banking",
+          "Assisted Hatching",
+          "Preimplantation Genetic Screening",
+          "Vitrification",
+          "Embryo Donation",
+          "Oocyte Donation"
+        ],
         'Dermatology': ["Acne Treatment", "Laser Hair Removal", "Skin Consultation", "Botox / Fillers", "Scar Removal"],
         'Gynecology': ["Pregnancy Checkup", "PCOS Treatment", "Ultrasound", "Menstrual Issues", "General Checkup"],
         'Dentist': ["Teeth Cleaning", "Root Canal", "Tooth Extraction", "Braces / Invisalign", "Teeth Whitening"],
@@ -97,7 +110,20 @@ function ClinicFlowWrapper() {
         // Fallback mapping just in case the backend hasn't updated yet!
         if (!data.services || data.services.length === 0) {
           const fallbackServices: Record<string, string[]> = {
-            'IVF': ["IVF Treatment", "IUI Treatment", "ICSI", "Egg Freezing", "Fertility Checkup"],
+            'IVF': [
+              "Intra Uterine Insemination (IUI)",
+              "In Vitro Fertilization (IVF)",
+              "Intra Cytoplasmic Sperm Injection (ICSI)",
+              "Intra Cytoplasmic Morphologic Sperm Injection (IMSI)",
+              "Testicular Sperm Aspiration/Extraction (TESA/TESE)",
+              "Oocyte Freezing",
+              "Semen Banking",
+              "Assisted Hatching",
+              "Preimplantation Genetic Screening",
+              "Vitrification",
+              "Embryo Donation",
+              "Oocyte Donation"
+            ],
             'Dermatology': ["Acne Treatment", "Laser Hair Removal", "Skin Consultation", "Botox / Fillers", "Scar Removal"],
             'Gynecology': ["Pregnancy Checkup", "PCOS Treatment", "Ultrasound", "Menstrual Issues", "General Checkup"],
             'Dentist': ["Teeth Cleaning", "Root Canal", "Tooth Extraction", "Braces / Invisalign", "Teeth Whitening"],
