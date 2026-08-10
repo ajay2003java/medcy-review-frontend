@@ -193,12 +193,12 @@ export default function FeedbackForm({ clinicId, questions, services = [], onCom
           <p className="text-[15px] text-gray-700 font-semibold mb-5 leading-snug">
             {t("Which service did you receive?")}
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-2 gap-2.5">
             {services.map((service, idx) => (
               <button
                 key={idx}
                 onClick={() => setSelectedService(service)}
-                className={`px-4 py-2.5 rounded-2xl text-sm font-semibold transition-all border-2 ${selectedService === service ? 'bg-primary border-primary text-white shadow-md shadow-primary/20 scale-[1.02]' : 'bg-white border-gray-100 text-gray-600 hover:border-gray-200 hover:bg-gray-50'}`}
+                className={`w-full min-h-[3.5rem] flex items-center justify-center text-center px-3 py-2 rounded-2xl text-[13px] font-semibold leading-tight transition-all border-2 ${selectedService === service ? 'bg-primary border-primary text-white shadow-md shadow-primary/20 scale-[1.02]' : 'bg-white border-gray-100 text-gray-600 hover:border-gray-200 hover:bg-gray-50'}`}
               >
                 {service}
               </button>
