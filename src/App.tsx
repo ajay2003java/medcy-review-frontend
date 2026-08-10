@@ -91,22 +91,16 @@ function ClinicFlowWrapper() {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 font-sans max-w-md mx-auto shadow-xl relative overflow-hidden flex flex-col">
       {/* Brand Header */}
-      {clinicData.logo_url ? (
-        <div className="w-full bg-white shadow-sm z-10 border-b border-gray-100/60 overflow-hidden rounded-b-3xl">
-          <img 
-            src={clinicData.logo_url} 
-            alt={clinicData.name} 
-            className="w-full h-auto max-h-48 object-contain p-4" 
-          />
-        </div>
-      ) : (
-        <div className="bg-primary text-white p-6 flex flex-col items-center justify-center rounded-b-3xl shadow-md z-10 transition-colors duration-300">
+      <div className="bg-primary text-white p-6 flex flex-col items-center justify-center rounded-b-3xl shadow-md z-10 transition-colors duration-300">
+        {clinicData.logo_url ? (
+          <img src={clinicData.logo_url} alt={clinicData.name} className="h-16 w-16 rounded-full object-cover mb-3 shadow-lg bg-white p-1" />
+        ) : (
           <div className="h-16 w-16 rounded-full bg-white/20 mb-3 flex items-center justify-center text-2xl font-bold">
             {clinicData.name.charAt(0)}
           </div>
-          <h1 className="text-xl font-bold text-center tracking-tight">{clinicData.name}</h1>
-        </div>
-      )}
+        )}
+        <h1 className="text-xl font-bold text-center tracking-tight">{clinicData.name}</h1>
+      </div>
 
       {/* Main Content Area */}
       <div className="flex-1 p-6 flex flex-col relative z-0">
