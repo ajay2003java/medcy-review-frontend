@@ -93,9 +93,25 @@ function ClinicFlowWrapper() {
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
     axios.get(`${API_URL}/api/v1/patient/clinic/${qr_identifier}`)
       .then(res => {
-        setClinicData(res.data);
+        const data = res.data;
+        // Fallback mapping just in case the backend hasn't updated yet!
+        if (!data.services || data.services.length === 0) {
+          const fallbackServices: Record<string, string[]> = {
+            'IVF': ["IVF Treatment", "IUI Treatment", "ICSI", "Egg Freezing", "Fertility Checkup"],
+            'Dermatology': ["Acne Treatment", "Laser Hair Removal", "Skin Consultation", "Botox / Fillers", "Scar Removal"],
+            'Gynecology': ["Pregnancy Checkup", "PCOS Treatment", "Ultrasound", "Menstrual Issues", "General Checkup"],
+            'Dentist': ["Teeth Cleaning", "Root Canal", "Tooth Extraction", "Braces / Invisalign", "Teeth Whitening"],
+            'General Hospital': ["General Consultation", "Blood Test", "Emergency Care", "Surgery", "Vaccination"]
+          };
+          
+          // Match the enum value string (e.g., "IVF" or "General Hospital")
+          let matchedCategory = data.category;
+          data.services = fallbackServices[matchedCategory] || fallbackServices['General Hospital'];
+        }
+        
+        setClinicData(data);
         // Apply theme color
-        document.documentElement.style.setProperty('--primary-color', res.data.theme_color);
+        document.documentElement.style.setProperty('--primary-color', data.theme_color);
       })
       .catch(err => {
         setError('Clinic not found or deactivated.');
