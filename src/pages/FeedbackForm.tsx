@@ -5,6 +5,7 @@ import axios from 'axios';
 interface Props {
   clinicId: string;
   questions: string[];
+  services?: string[];
   onComplete: (result: any) => void;
 }
 
@@ -19,6 +20,7 @@ const TRANSLATIONS: Record<string, Record<'en'|'te', string>> = {
   "Submit Feedback": { en: "Submit Feedback", te: "ఫీడ్‌బ్యాక్ సమర్పించండి" },
   "Please answer all questions": { en: "Please answer all questions", te: "దయచేసి అన్ని ప్రశ్నలకు సమాధానం ఇవ్వండి" },
   "Submitting...": { en: "Submitting...", te: "సమర్పిస్తోంది..." },
+  "Which service did you receive?": { en: "Which service did you receive?", te: "మీరు ఏ సేవను పొందారు?" },
   // IVF
   "Did you feel fully supported by our fertility specialists during your visit?": { en: "Did you feel fully supported by our fertility specialists during your visit?", te: "మీ సందర్శన సమయంలో మా ఫెర్టిలిటీ స్పెషలిస్ట్‌ల నుండి మీకు పూర్తి మద్దతు లభించిందా?" },
   "Were our staff empathetic and clear about your treatment options?": { en: "Were our staff empathetic and clear about your treatment options?", te: "మా సిబ్బంది మీ చికిత్స ఎంపికల గురించి స్పష్టంగా వివరించారా?" },
@@ -75,11 +77,12 @@ const RATING_OPTIONS = [
   { label: 'Excellent', value: 5 }
 ];
 
-export default function FeedbackForm({ clinicId, questions, onComplete }: Props) {
+export default function FeedbackForm({ clinicId, questions, services = [], onComplete }: Props) {
   const [lang, setLang] = useState<'en'|'te'>('en');
   const [privateFeedback, setPrivateFeedback] = useState('');
   const [loading, setLoading] = useState(false);
   const [answers, setAnswers] = useState<Record<number, number>>({});
+  const [selectedService, setSelectedService] = useState<string>('');
 
   const t = (text: string) => TRANSLATIONS[text]?.[lang] || text;
 
@@ -95,10 +98,13 @@ export default function FeedbackForm({ clinicId, questions, onComplete }: Props)
   };
 
   const averageRating = calculateAverageRating();
+  // Ensure we also require a service if services are provided
   const allQuestionsAnswered = Object.keys(answers).length === questions.length && questions.length > 0;
+  const isServiceSelected = services.length === 0 || selectedService !== '';
+  const canSubmit = allQuestionsAnswered && isServiceSelected;
 
   const handleSubmit = async () => {
-    if (!allQuestionsAnswered) return;
+    if (!canSubmit) return;
     setLoading(true);
 
     // Mock response for Demo Mode so the backend doesn't need to be running!
@@ -129,7 +135,8 @@ export default function FeedbackForm({ clinicId, questions, onComplete }: Props)
       const res = await axios.post(`${API_URL}/api/v1/patient/feedback`, {
         clinic_id: clinicId,
         rating_score: averageRating,
-        private_feedback: privateFeedback
+        private_feedback: privateFeedback,
+        service_received: selectedService || null
       });
       onComplete(res.data);
     } catch (err) {
@@ -196,10 +203,30 @@ export default function FeedbackForm({ clinicId, questions, onComplete }: Props)
         </div>
       )}
 
+      {/* Services Selection (Only shown if all questions answered and average rating > 3) */}
+      {allQuestionsAnswered && averageRating > 3 && services && services.length > 0 && (
+        <div className="mb-8 animate-in fade-in slide-in-from-bottom-4">
+          <label className="block text-[15px] font-bold text-gray-700 mb-4 ml-1">
+            {t("Which service did you receive?")}
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {services.map((service, idx) => (
+              <button
+                key={idx}
+                onClick={() => setSelectedService(service)}
+                className={`px-4 py-2.5 rounded-2xl text-sm font-semibold transition-all border-2 ${selectedService === service ? 'bg-primary border-primary text-white shadow-md shadow-primary/20 scale-[1.02]' : 'bg-white border-gray-100 text-gray-600 hover:border-gray-200 hover:bg-gray-50'}`}
+              >
+                {service}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="mt-auto pt-4 pb-8">
         <button
           onClick={handleSubmit}
-          disabled={!allQuestionsAnswered || loading}
+          disabled={!canSubmit || loading}
           className="w-full bg-primary hover:bg-primary/90 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-bold py-4.5 rounded-2xl shadow-xl shadow-primary/20 flex items-center justify-center transition-all active:scale-[0.98] disabled:shadow-none"
         >
           {loading ? (
@@ -209,7 +236,7 @@ export default function FeedbackForm({ clinicId, questions, onComplete }: Props)
             </span>
           ) : (
             <>
-              <span className="text-[15px]">{allQuestionsAnswered ? t("Submit Feedback") : t("Please answer all questions")}</span>
+              <span className="text-[15px]">{canSubmit ? t("Submit Feedback") : t("Please answer all questions")}</span>
               <Send className="ml-2 h-5 w-5" />
             </>
           )}

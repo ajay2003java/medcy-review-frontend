@@ -11,10 +11,11 @@ import axios from 'axios';
 export interface ClinicContextData {
   id: string;
   name: string;
-  logo_url: string;
+  logo_url: string | null;
   theme_color: string;
   category: string;
   questions: string[];
+  services: string[];
 }
 
 export default function App() {
@@ -36,32 +37,50 @@ function ClinicFlowWrapper() {
   const [error, setError] = useState('');
 
   // Flow State
-  const [step, setStep] = useState<'feedback' | 'result'>('feedback');
+  const [step, setStep] = useState<'welcome' | 'feedback' | 'result'>('welcome');
   const [feedbackResult, setFeedbackResult] = useState<any>(null);
 
   useEffect(() => {
     // If it's a demo route, we mock the backend response instantly!
     if (qr_identifier?.startsWith('demo-')) {
-      const catStr = qr_identifier.replace('demo-', '');
-      const colorMap: Record<string, string> = {
-        'ivf': '#ec4899', 'dermatology': '#8b5cf6', 'gynecology': '#f43f5e', 'dentist': '#0ea5e9', 'general-hospital': '#10b981'
+      const categoryStr = qr_identifier.replace('demo-', '');
+      const categoryMap: Record<string, string> = {
+        'ivf': 'IVF',
+        'dermatology': 'Dermatology',
+        'gynecology': 'Gynecology',
+        'dentist': 'Dentist',
+        'general-hospital': 'General Hospital'
+      };
+      const demoCategory = categoryMap[categoryStr] || 'General Hospital';
+
+      const demoQuestions: Record<string, string[]> = {
+        'IVF': ['Did you feel fully supported by our fertility specialists during your visit?', 'Were our staff empathetic and clear about your treatment options?', 'Did you feel comfortable asking questions during your consultation?', 'Was the facility clean, private, and comfortable for you?'],
+        'Dermatology': ['Were you satisfied with your consultation and skin treatment plan?', 'Did the doctor explain the procedures and expected outcomes clearly?', 'Was the clinic environment welcoming and hygienic?', 'Was it easy to schedule and check-in for your appointment?'],
+        'Gynecology': ['Did you feel that your privacy and comfort were respected during your visit?', 'Did the doctor address all your concerns regarding women\'s health?', 'Was the nursing staff supportive and gentle?', 'Would you recommend our facility to your friends and family?'],
+        'Dentist': ['Did the dentist make sure you were comfortable during the procedure?', 'Was the clinic environment clean and welcoming?', 'Did the dentist explain the treatment plan clearly?', 'Were our front-desk staff polite and helpful?'],
+        'General Hospital': ['Were you seen by a doctor within a reasonable waiting time?', 'Did you feel well taken care of by the nursing and medical staff?', 'Was the admission and discharge process smooth?', 'Did you find the hospital rooms and facilities completely clean?']
       };
 
-      const questionsMap: Record<string, string[]> = {
-        'ivf': ['Did you feel fully supported by our fertility specialists during your visit?', 'Were our staff empathetic and clear about your treatment options?', 'Did you feel comfortable asking questions during your consultation?', 'Was the facility clean, private, and comfortable for you?'],
-        'dermatology': ['Were you satisfied with your consultation and skin treatment plan?', 'Did the doctor explain the procedures and expected outcomes clearly?', 'Was the clinic environment welcoming and hygienic?', 'Was it easy to schedule and check-in for your appointment?'],
-        'gynecology': ['Did you feel that your privacy and comfort were respected during your visit?', 'Did the doctor address all your concerns regarding women\'s health?', 'Was the nursing staff supportive and gentle?', 'Would you recommend our facility to your friends and family?'],
-        'dentist': ['Did the dentist make sure you were comfortable during the procedure?', 'Was the clinic environment clean and welcoming?', 'Did the dentist explain the treatment plan clearly?', 'Were our front-desk staff polite and helpful?'],
-        'general-hospital': ['Were you seen by a doctor within a reasonable waiting time?', 'Did you feel well taken care of by the nursing and medical staff?', 'Was the admission and discharge process smooth?', 'Did you find the hospital rooms and facilities completely clean?']
+      const demoServices: Record<string, string[]> = {
+        'IVF': ["IVF Treatment", "IUI Treatment", "ICSI", "Egg Freezing", "Fertility Checkup"],
+        'Dermatology': ["Acne Treatment", "Laser Hair Removal", "Skin Consultation", "Botox / Fillers", "Scar Removal"],
+        'Gynecology': ["Pregnancy Checkup", "PCOS Treatment", "Ultrasound", "Menstrual Issues", "General Checkup"],
+        'Dentist': ["Teeth Cleaning", "Root Canal", "Tooth Extraction", "Braces / Invisalign", "Teeth Whitening"],
+        'General Hospital': ["General Consultation", "Blood Test", "Emergency Care", "Surgery", "Vaccination"]
+      };
+
+      const colors: Record<string, string> = {
+        'ivf': '#ec4899', 'dermatology': '#8b5cf6', 'gynecology': '#f43f5e', 'dentist': '#0ea5e9', 'general-hospital': '#10b981'
       };
       
       const mockData: ClinicContextData = {
-        id: `demo-${catStr}`,
-        name: `Demo ${catStr.toUpperCase()} Clinic`,
-        logo_url: '',
-        theme_color: colorMap[catStr] || '#3498db',
-        category: catStr,
-        questions: questionsMap[catStr] || questionsMap['general-hospital']
+        id: `demo-${categoryStr}`,
+        name: `Demo ${demoCategory} Clinic`,
+        logo_url: null,
+        theme_color: colors[categoryStr] || '#10b981',
+        category: demoCategory,
+        questions: demoQuestions[demoCategory] || demoQuestions['General Hospital'],
+        services: demoServices[demoCategory] || demoServices['General Hospital']
       };
       
       setClinicData(mockData);
@@ -104,10 +123,16 @@ function ClinicFlowWrapper() {
 
       {/* Main Content Area */}
       <div className="flex-1 p-6 flex flex-col relative z-0">
+        {step === 'welcome' && (
+          <WelcomeScreen
+            onStart={() => setStep('feedback')}
+          />
+        )}
         {step === 'feedback' && (
           <FeedbackForm 
             clinicId={clinicData.id}
             questions={clinicData.questions}
+            services={clinicData.services}
             onComplete={(result) => {
               setFeedbackResult(result);
               setStep('result');
