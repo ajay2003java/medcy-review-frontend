@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Activity, Sparkles, Baby, Smile, Building2 } from 'lucide-react';
+import { Activity, Sparkles, Baby, Smile, Building2, GraduationCap } from 'lucide-react';
 
 const categories = [
   { id: 'ivf', name: 'IVF Clinic', icon: Baby, color: '#ec4899', desc: 'Test the IVF patient flow' },
@@ -8,6 +8,7 @@ const categories = [
   { id: 'gynecology', name: 'Gynecology', icon: Activity, color: '#f43f5e', desc: 'Test the women\'s health flow' },
   { id: 'dentist', name: 'Dentist', icon: Smile, color: '#0ea5e9', desc: 'Test the dental care flow' },
   { id: 'general-hospital', name: 'General Hospital', icon: Building2, color: '#10b981', desc: 'Test the hospital flow' },
+  { id: 'junior-college', name: 'Junior College', icon: GraduationCap, color: '#f59e0b', desc: 'Test the student feedback flow', isInstitute: true },
 ];
 
 export default function DemoPage() {
@@ -17,8 +18,8 @@ export default function DemoPage() {
         <div className="text-center mb-12">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Medcy Review Engine</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Welcome to the internal testing dashboard. Below are the 5 core categories we support. 
-            Click any card to preview exactly what a patient will experience when they scan a clinic's QR code.
+            Welcome to the internal testing dashboard. Below are the core categories we support. 
+            Click any card to preview exactly what a user will experience when they scan a QR code.
           </p>
         </div>
 
@@ -28,7 +29,7 @@ export default function DemoPage() {
             return (
               <Link 
                 key={cat.id} 
-                to={`/review/demo-${cat.id}`}
+                to={cat.isInstitute ? `/institute/demo-${cat.id}` : `/review/demo-${cat.id}`}
                 className="group bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:border-transparent transition-all duration-300 relative overflow-hidden flex flex-col items-center text-center hover:-translate-y-1"
               >
                 <div 

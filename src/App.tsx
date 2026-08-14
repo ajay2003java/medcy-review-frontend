@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-
 import AdminDashboard from './pages/admin/AdminDashboard';
 import WelcomeScreen from './pages/WelcomeScreen';
 import FeedbackForm from './pages/FeedbackForm';
+import InstituteFeedbackForm from './pages/InstituteFeedbackForm';
 import ResultScreen from './pages/ResultScreen';
 import DemoPage from './pages/DemoPage';
 import { useState, useEffect } from 'react';
@@ -25,6 +26,7 @@ export default function App() {
         <Route path="/admin/*" element={<AdminDashboard />} />
         <Route path="/" element={<DemoPage />} />
         <Route path="/review/:qr_identifier" element={<ClinicFlowWrapper />} />
+        <Route path="/institute/:qr_identifier" element={<InstituteFlowWrapper />} />
       </Routes>
     </Router>
   );
@@ -189,3 +191,75 @@ function ClinicFlowWrapper() {
     </div>
   );
 }
+
+function InstituteFlowWrapper() {
+  const { qr_identifier } = useParams();
+  const [instituteData, setInstituteData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  // Flow State
+  const [step, setStep] = useState<'feedback' | 'result'>('feedback');
+  const [feedbackResult, setFeedbackResult] = useState<any>(null);
+
+  useEffect(() => {
+    // Fetch real institute data from backend
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    axios.get(`${API_URL}/api/v1/institute-flow/institute/${qr_identifier}`)
+      .then(res => {
+        const data = res.data;
+        setInstituteData(data);
+        document.documentElement.style.setProperty('--primary-color', data.theme_color);
+      })
+      .catch(err => {
+        setError('Institute not found or deactivated.');
+      })
+      .finally(() => setLoading(false));
+  }, [qr_identifier]);
+
+  if (loading) return <div className="flex h-screen items-center justify-center">Loading...</div>;
+  if (error) return <div className="flex h-screen items-center justify-center text-red-500">{error}</div>;
+  if (!instituteData) return null;
+
+  return (
+    <div className="min-h-screen bg-gray-50 text-gray-900 font-sans max-w-md mx-auto shadow-xl relative overflow-hidden flex flex-col">
+      {/* Brand Header */}
+      {instituteData.logo_url ? (
+        <div className="w-full bg-white shadow-sm z-10 border-b border-gray-100/60 overflow-hidden rounded-b-3xl">
+          <img 
+            src={instituteData.logo_url} 
+            alt={instituteData.name} 
+            className="w-full h-auto max-h-48 object-contain p-4" 
+          />
+        </div>
+      ) : (
+        <div className="bg-primary text-white p-6 flex flex-col items-center justify-center rounded-b-3xl shadow-md z-10 transition-colors duration-300">
+          <div className="h-16 w-16 rounded-full bg-white/20 mb-3 flex items-center justify-center text-2xl font-bold">
+            {instituteData.name.charAt(0)}
+          </div>
+          <h1 className="text-xl font-bold text-center tracking-tight">{instituteData.name}</h1>
+        </div>
+      )}
+
+      {/* Main Content Area */}
+      <div className="flex-1 p-6 flex flex-col relative z-0">
+        {step === 'feedback' && (
+          <InstituteFeedbackForm 
+            instituteId={instituteData.id}
+            category={instituteData.category}
+            services={instituteData.services || []}
+            questions={instituteData.questions}
+            onComplete={(result) => {
+              setFeedbackResult(result);
+              setStep('result');
+            }}
+          />
+        )}
+        {step === 'result' && (
+          <ResultScreen result={feedbackResult} />
+        )}
+      </div>
+    </div>
+  );
+}
+
