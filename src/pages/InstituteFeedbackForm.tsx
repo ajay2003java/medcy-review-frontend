@@ -40,7 +40,7 @@ const RATING_OPTIONS = [
 ];
 
 export default function InstituteFeedbackForm({ instituteId, category, services, questions, onComplete }: Props) {
-  const [step, setStep] = useState<'ROLE' | 'SUBROLE' | 'QUESTIONS' | 'SERVICES' | 'PRIVATE'>('ROLE');
+  const [step, setStep] = useState<'ROLE' | 'SUBROLE' | 'QUESTIONS' | 'PRIVATE'>('ROLE');
   const [role, setRole] = useState<string>('');
   
   const [answers, setAnswers] = useState<Record<number, number>>({});
@@ -78,16 +78,6 @@ export default function InstituteFeedbackForm({ instituteId, category, services,
   const allAnswered = currentQuestions.length > 0 && Object.keys(answers).length === currentQuestions.length;
 
   const handleQuestionsNext = () => {
-    if (services.length > 0 && (role.includes('Student') || role === 'Parent')) {
-      setStep('SERVICES');
-    } else if (averageRating <= 3) {
-      setStep('PRIVATE');
-    } else {
-      handleSubmit();
-    }
-  };
-
-  const handleServicesNext = () => {
     if (averageRating <= 3) {
       setStep('PRIVATE');
     } else {
@@ -219,49 +209,37 @@ export default function InstituteFeedbackForm({ instituteId, category, services,
             </div>
           </div>
         ))}
+
+        {services.length > 0 && (role.includes('Student') || role === 'Parent') && (
+          <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100/50 mt-8">
+            <p className="text-lg md:text-xl font-semibold text-gray-800 mb-6 text-center">
+              {category === 'School' ? 'What are you most satisfied with?' : 'Which program are you associated with?'}
+            </p>
+            <div className="grid grid-cols-1 gap-3">
+              {services.map((svc) => (
+                <button
+                  key={svc}
+                  type="button"
+                  onClick={() => setSelectedService(svc)}
+                  className={`p-4 rounded-2xl border-2 text-left transition-all ${
+                    selectedService === svc 
+                      ? 'border-primary bg-primary/5 shadow-md font-semibold text-primary' 
+                      : 'border-gray-100 hover:border-primary/50 text-gray-700 bg-white hover:bg-gray-50'
+                  }`}
+                >
+                  {svc}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         
         <button
           onClick={handleQuestionsNext}
-          disabled={!allAnswered || loading}
+          disabled={!allAnswered || (services.length > 0 && (role.includes('Student') || role === 'Parent') && !selectedService) || loading}
           className="w-full bg-primary text-white py-4 md:py-5 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-8"
         >
-          {loading ? 'Submitting...' : 'Next'}
-          {!loading && <Send className="w-5 h-5" />}
-        </button>
-      </div>
-    );
-  }
-
-  if (step === 'SERVICES') {
-    return (
-      <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
-        <button onClick={() => setStep('QUESTIONS')} className="flex items-center text-gray-500 hover:text-primary mb-2 transition-colors">
-          <ArrowLeft className="h-4 w-4 mr-1" /> Back
-        </button>
-        <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
-          {category === 'School' ? 'What are you most satisfied with?' : 'Which program are you associated with?'}
-        </h2>
-        <div className="grid grid-cols-1 gap-3">
-          {services.map((svc) => (
-            <button
-              key={svc}
-              onClick={() => setSelectedService(svc)}
-              className={`p-4 rounded-2xl border-2 text-left transition-all ${
-                selectedService === svc 
-                  ? 'border-primary bg-primary/5 shadow-md font-semibold text-primary' 
-                  : 'border-gray-100 hover:border-primary/50 text-gray-700 bg-white hover:bg-gray-50'
-              }`}
-            >
-              {svc}
-            </button>
-          ))}
-        </div>
-        <button
-          onClick={handleServicesNext}
-          disabled={!selectedService || loading}
-          className="w-full bg-primary text-white py-4 md:py-5 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
-        >
-          {loading ? 'Submitting...' : 'Submit'}
+          {loading ? 'Submitting...' : (averageRating <= 3 ? 'Next' : 'Submit')}
           {!loading && <Send className="w-5 h-5" />}
         </button>
       </div>

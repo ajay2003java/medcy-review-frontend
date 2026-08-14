@@ -41,6 +41,7 @@ function ClinicFlowWrapper() {
   // Flow State
   const [step, setStep] = useState<'feedback' | 'result'>('feedback');
   const [feedbackResult, setFeedbackResult] = useState<any>(null);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     // If it's a demo route, we mock the backend response instantly!
@@ -154,12 +155,13 @@ function ClinicFlowWrapper() {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 font-sans max-w-md mx-auto shadow-xl relative overflow-hidden flex flex-col">
       {/* Brand Header */}
-      {clinicData.logo_url ? (
+      {clinicData.logo_url && !imageError ? (
         <div className="w-full bg-white shadow-sm z-10 border-b border-gray-100/60 overflow-hidden rounded-b-3xl">
           <img 
             src={clinicData.logo_url} 
             alt={clinicData.name} 
-            className="w-full h-auto max-h-48 object-contain p-4" 
+            className="w-full h-auto max-h-48 object-contain p-4"
+            onError={() => setImageError(true)}
           />
         </div>
       ) : (
@@ -201,6 +203,7 @@ function InstituteFlowWrapper() {
   // Flow State
   const [step, setStep] = useState<'feedback' | 'result'>('feedback');
   const [feedbackResult, setFeedbackResult] = useState<any>(null);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     // Fetch real institute data from backend
@@ -224,12 +227,13 @@ function InstituteFlowWrapper() {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 font-sans max-w-md mx-auto shadow-xl relative overflow-hidden flex flex-col">
       {/* Brand Header */}
-      {instituteData.logo_url ? (
+      {instituteData.logo_url && !imageError ? (
         <div className="w-full bg-white shadow-sm z-10 border-b border-gray-100/60 overflow-hidden rounded-b-3xl">
           <img 
             src={instituteData.logo_url} 
             alt={instituteData.name} 
             className="w-full h-auto max-h-48 object-contain p-4" 
+            onError={() => setImageError(true)}
           />
         </div>
       ) : (
