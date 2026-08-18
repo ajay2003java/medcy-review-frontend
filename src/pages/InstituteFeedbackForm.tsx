@@ -46,6 +46,7 @@ export default function InstituteFeedbackForm({ instituteId, category, services,
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [selectedService, setSelectedService] = useState<string>('');
   const [privateFeedback, setPrivateFeedback] = useState('');
+  const [language, setLanguage] = useState<'en' | 'te'>('en');
   const [loading, setLoading] = useState(false);
 
   const handleRoleSelect = (selectedRole: string) => {
@@ -76,6 +77,15 @@ export default function InstituteFeedbackForm({ instituteId, category, services,
   const currentQuestions = questions[role] || [];
   const averageRating = calculateAverageRating();
   const allAnswered = currentQuestions.length > 0 && Object.keys(answers).length === currentQuestions.length;
+
+  const teluguParentQuestions = [
+    "మీ పిల్లల విద్యా ప్రగతి పట్ల మీరు సంతృప్తిగా ఉన్నారా?",
+    "క్యాంపస్ వాతావరణం సురక్షితంగా ఉందని మీరు భావిస్తున్నారా?",
+    "మేనేజ్‌మెంట్ పారదర్శకంగా మరియు వారితో సులభంగా మాట్లాడగలిగేలా ఉందా?",
+    "మీరు ఇతర తల్లిదండ్రులకు ఈ విద్యాసంస్థను సిఫార్సు చేస్తారా?"
+  ];
+  
+  const displayedQuestions = role === 'Parent' && language === 'te' ? teluguParentQuestions : currentQuestions;
 
   const handleQuestionsNext = () => {
     if (averageRating <= 3) {
@@ -186,8 +196,27 @@ export default function InstituteFeedbackForm({ instituteId, category, services,
         <button onClick={() => setStep('ROLE')} className="flex items-center text-gray-500 hover:text-primary mb-2 transition-colors">
           <ArrowLeft className="h-4 w-4 mr-1" /> Back
         </button>
+
+        {role === 'Parent' && (
+          <div className="flex justify-center mb-6">
+            <div className="bg-gray-100 p-1 rounded-xl inline-flex shadow-inner">
+              <button
+                onClick={() => setLanguage('en')}
+                className={`px-6 py-2 rounded-lg text-sm font-bold transition-colors ${language === 'en' ? 'bg-white text-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+              >
+                English
+              </button>
+              <button
+                onClick={() => setLanguage('te')}
+                className={`px-6 py-2 rounded-lg text-sm font-bold transition-colors ${language === 'te' ? 'bg-white text-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+              >
+                తెలుగు
+              </button>
+            </div>
+          </div>
+        )}
         
-        {currentQuestions.map((q, idx) => (
+        {displayedQuestions.map((q, idx) => (
           <div key={idx} className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100/50">
             <p className="text-lg md:text-xl font-semibold text-gray-800 mb-8 text-center">{q}</p>
             <div className="flex justify-between items-center max-w-md mx-auto relative px-2">
