@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Activity, Sparkles, Baby, Smile, Building2, GraduationCap } from 'lucide-react';
+import { Activity, Sparkles, Baby, Smile, Building2, GraduationCap, FlaskConical } from 'lucide-react';
 
 const categories = [
   { id: 'ivf', name: 'IVF Clinic', icon: Baby, color: '#ec4899', desc: 'Test the IVF patient flow' },
@@ -8,6 +8,7 @@ const categories = [
   { id: 'gynecology', name: 'Gynecology', icon: Activity, color: '#f43f5e', desc: 'Test the women\'s health flow' },
   { id: 'dentist', name: 'Dentist', icon: Smile, color: '#0ea5e9', desc: 'Test the dental care flow' },
   { id: 'general-hospital', name: 'General Hospital', icon: Building2, color: '#10b981', desc: 'Test the hospital flow' },
+  { id: 'laboratory', name: 'Laboratory', icon: FlaskConical, color: '#10b981', desc: 'Test the laboratory feedback flow' },
   { id: 'junior-college', name: 'Junior College', icon: GraduationCap, color: '#f59e0b', desc: 'Test the student feedback flow', isInstitute: true },
 ];
 

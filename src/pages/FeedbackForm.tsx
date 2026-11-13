@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Send, Languages } from 'lucide-react';
 import axios from 'axios';
+import { generateDynamicReview } from '../utils/reviewGenerator';
 
 interface Props {
   clinicId: string;
+  clinicName?: string;
+  category?: string;
   questions: string[];
   services?: string[];
   onComplete: (result: any) => void;
@@ -77,7 +80,14 @@ const RATING_OPTIONS = [
   { label: 'Excellent', value: 5 }
 ];
 
-export default function FeedbackForm({ clinicId, questions, services = [], onComplete }: Props) {
+export default function FeedbackForm({
+  clinicId,
+  clinicName,
+  category,
+  questions,
+  services = [],
+  onComplete
+}: Props) {
   const [lang, setLang] = useState<'en'|'te'>('en');
   const [privateFeedback, setPrivateFeedback] = useState('');
   const [loading, setLoading] = useState(false);
@@ -107,26 +117,27 @@ export default function FeedbackForm({ clinicId, questions, services = [], onCom
     if (!canSubmit) return;
     setLoading(true);
 
-    // Mock response for Demo Mode so the backend doesn't need to be running!
+    // Mock response for Demo Mode so the frontend test generates dynamic unique SEO reviews instantly
     if (clinicId.startsWith('demo-')) {
-      const catStr = clinicId.replace('demo-', '');
-      const reviewDrafts: Record<string, string> = {
-        'ivf': "The fertility specialists here are incredibly supportive. They guided us through every step of the IVF process with compassion and expertise. Highly recommend for any couples looking for fertility care!",
-        'dermatology': "Fantastic experience! The dermatologist really took the time to understand my skin concerns and provided an acne treatment plan that worked wonders.",
-        'gynecology': "The doctors made me feel completely comfortable and answered all my questions regarding my women's health concerns. Very professional care.",
-        'dentist': "A pain-free and professional dental experience! The staff is very welcoming and the clinic is incredibly clean. Great teeth cleaning service.",
-        'general-hospital': "Excellent care and surprisingly short wait times. The nursing staff was very attentive and professional."
-      };
-
       setTimeout(() => {
         const isPositive = averageRating >= 4;
+        const catStr = category || clinicId.replace('demo-', '');
+        const targetName = clinicName || `Demo ${catStr} Clinic`;
+        const dynamicDraft = isPositive
+          ? generateDynamicReview({
+              clinicName: targetName,
+              category: catStr,
+              serviceReceived: selectedService || null
+            })
+          : null;
+
         onComplete({
           action_flow: isPositive ? 'POSITIVE' : 'PRIVATE',
-          generated_review_draft: isPositive ? (reviewDrafts[catStr] || "Great experience!") : null,
+          generated_review_draft: dynamicDraft,
           google_url: isPositive ? 'https://google.com' : null
         });
         setLoading(false);
-      }, 1000);
+      }, 700);
       return;
     }
 
@@ -136,7 +147,9 @@ export default function FeedbackForm({ clinicId, questions, services = [], onCom
         clinic_id: clinicId,
         rating_score: averageRating,
         private_feedback: privateFeedback,
-        service_received: selectedService || null
+        service_received: selectedService || null,
+        clinic_name: clinicName || null,
+        category: category || null
       });
       onComplete(res.data);
     } catch (err) {

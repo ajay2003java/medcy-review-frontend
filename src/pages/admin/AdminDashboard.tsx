@@ -215,6 +215,7 @@ export default function AdminDashboard() {
                     <option value="Gynecology">Gynecology</option>
                     <option value="Dentist">Dentist</option>
                     <option value="General Hospital">General Hospital</option>
+                    <option value="Laboratory">Laboratory</option>
                   </select>
                 </div>
 
@@ -307,6 +308,7 @@ export default function AdminDashboard() {
                     <option value="Junior College">Junior College</option>
                     <option value="Degree College">Degree College</option>
                     <option value="Engineering College">Engineering College</option>
+                    <option value="Laboratory">Laboratory</option>
                   </select>
                 </div>
 

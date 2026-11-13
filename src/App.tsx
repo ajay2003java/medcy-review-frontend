@@ -3,6 +3,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import WelcomeScreen from './pages/WelcomeScreen';
 import FeedbackForm from './pages/FeedbackForm';
 import InstituteFeedbackForm from './pages/InstituteFeedbackForm';
+import LaboratoryFeedbackForm from './pages/LaboratoryFeedbackForm';
 import ResultScreen from './pages/ResultScreen';
 import DemoPage from './pages/DemoPage';
 import { useState, useEffect } from 'react';
@@ -52,7 +53,8 @@ function ClinicFlowWrapper() {
         'dermatology': 'Dermatology',
         'gynecology': 'Gynecology',
         'dentist': 'Dentist',
-        'general-hospital': 'General Hospital'
+        'general-hospital': 'General Hospital',
+        'laboratory': 'Laboratory'
       };
       const demoCategory = categoryMap[categoryStr] || 'General Hospital';
 
@@ -61,7 +63,13 @@ function ClinicFlowWrapper() {
         'Dermatology': ['Were you satisfied with your consultation and skin treatment plan?', 'Did the doctor explain the procedures and expected outcomes clearly?', 'Was the clinic environment welcoming and hygienic?', 'Was it easy to schedule and check-in for your appointment?'],
         'Gynecology': ['Did you feel that your privacy and comfort were respected during your visit?', 'Did the doctor address all your concerns regarding women\'s health?', 'Was the nursing staff supportive and gentle?', 'Would you recommend our facility to your friends and family?'],
         'Dentist': ['Did the dentist make sure you were comfortable during the procedure?', 'Was the clinic environment clean and welcoming?', 'Did the dentist explain the treatment plan clearly?', 'Were our front-desk staff polite and helpful?'],
-        'General Hospital': ['Were you seen by a doctor within a reasonable waiting time?', 'Did you feel well taken care of by the nursing and medical staff?', 'Was the admission and discharge process smooth?', 'Did you find the hospital rooms and facilities completely clean?']
+        'General Hospital': ['Were you seen by a doctor within a reasonable waiting time?', 'Did you feel well taken care of by the nursing and medical staff?', 'Was the admission and discharge process smooth?', 'Did you find the hospital rooms and facilities completely clean?'],
+        'Laboratory': [
+          "Did you receive your laboratory test reports within the promised time?",
+          "Was the laboratory clean, hygienic and well-maintained?",
+          "Were the reception and support staff friendly and helpful throughout your visit?",
+          "Did the laboratory staff make you feel comfortable and relaxed during blood collection and other tests?"
+        ]
       };
 
       const demoServices: Record<string, string[]> = {
@@ -82,16 +90,36 @@ function ClinicFlowWrapper() {
         'Dermatology': ["Acne Treatment", "Laser Hair Removal", "Skin Consultation", "Botox / Fillers", "Scar Removal"],
         'Gynecology': ["Pregnancy Checkup", "PCOS Treatment", "Ultrasound", "Menstrual Issues", "General Checkup"],
         'Dentist': ["Teeth Cleaning", "Root Canal", "Tooth Extraction", "Braces / Invisalign", "Teeth Whitening"],
-        'General Hospital': ["General Consultation", "Blood Test", "Emergency Care", "Surgery", "Vaccination"]
+        'General Hospital': ["General Consultation", "Blood Test", "Emergency Care", "Surgery", "Vaccination"],
+        'Laboratory': [
+          "Blood Tests",
+          "Urine Tests",
+          "Diabetes Tests",
+          "Full Body Checkup",
+          "Health Packages",
+          "ECG Test",
+          "X-Ray",
+          "Ultrasound Scan",
+          "Sample Collection at Home",
+          "Hormone Tests",
+          "Vitamin Tests",
+          "Microbiology Tests",
+          "Liver Function Test",
+          "Lipid Profile",
+          "Thyroid Test",
+          "Kidney Function Test",
+          "Pathology Tests",
+          "Other"
+        ]
       };
 
       const colors: Record<string, string> = {
-        'ivf': '#ec4899', 'dermatology': '#8b5cf6', 'gynecology': '#f43f5e', 'dentist': '#0ea5e9', 'general-hospital': '#10b981'
+        'ivf': '#ec4899', 'dermatology': '#8b5cf6', 'gynecology': '#f43f5e', 'dentist': '#0ea5e9', 'general-hospital': '#10b981', 'laboratory': '#10b981'
       };
       
       const mockData: ClinicContextData = {
         id: `demo-${categoryStr}`,
-        name: `Demo ${demoCategory} Clinic`,
+        name: demoCategory === 'Laboratory' ? 'Demo Diagnostic Laboratory' : `Demo ${demoCategory} Clinic`,
         logo_url: null,
         theme_color: colors[categoryStr] || '#10b981',
         category: demoCategory,
@@ -130,7 +158,27 @@ function ClinicFlowWrapper() {
             'Dermatology': ["Acne Treatment", "Laser Hair Removal", "Skin Consultation", "Botox / Fillers", "Scar Removal"],
             'Gynecology': ["Pregnancy Checkup", "PCOS Treatment", "Ultrasound", "Menstrual Issues", "General Checkup"],
             'Dentist': ["Teeth Cleaning", "Root Canal", "Tooth Extraction", "Braces / Invisalign", "Teeth Whitening"],
-            'General Hospital': ["General Consultation", "Blood Test", "Emergency Care", "Surgery", "Vaccination"]
+            'General Hospital': ["General Consultation", "Blood Test", "Emergency Care", "Surgery", "Vaccination"],
+            'Laboratory': [
+              "Blood Tests",
+              "Urine Tests",
+              "Diabetes Tests",
+              "Full Body Checkup",
+              "Health Packages",
+              "ECG Test",
+              "X-Ray",
+              "Ultrasound Scan",
+              "Sample Collection at Home",
+              "Hormone Tests",
+              "Vitamin Tests",
+              "Microbiology Tests",
+              "Liver Function Test",
+              "Lipid Profile",
+              "Thyroid Test",
+              "Kidney Function Test",
+              "Pathology Tests",
+              "Other"
+            ]
           };
           
           // Match the enum value string (e.g., "IVF" or "General Hospital")
@@ -176,15 +224,30 @@ function ClinicFlowWrapper() {
       {/* Main Content Area */}
       <div className="flex-1 p-6 flex flex-col relative z-0">
         {step === 'feedback' && (
-          <FeedbackForm 
-            clinicId={clinicData.id}
-            questions={clinicData.questions}
-            services={clinicData.services}
-            onComplete={(result) => {
-              setFeedbackResult(result);
-              setStep('result');
-            }}
-          />
+          clinicData.category === 'Laboratory' ? (
+            <LaboratoryFeedbackForm 
+              clinicId={clinicData.id}
+              clinicName={clinicData.name}
+              questions={clinicData.questions}
+              services={clinicData.services}
+              onComplete={(result) => {
+                setFeedbackResult(result);
+                setStep('result');
+              }}
+            />
+          ) : (
+            <FeedbackForm 
+              clinicId={clinicData.id}
+              clinicName={clinicData.name}
+              category={clinicData.category}
+              questions={clinicData.questions}
+              services={clinicData.services}
+              onComplete={(result) => {
+                setFeedbackResult(result);
+                setStep('result');
+              }}
+            />
+          )
         )}
         {step === 'result' && (
           <ResultScreen result={feedbackResult} />
@@ -206,6 +269,47 @@ function InstituteFlowWrapper() {
   const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
+    // If it's a demo route for laboratory
+    if (qr_identifier === 'demo-laboratory') {
+      const mockData = {
+        id: 'demo-laboratory',
+        name: 'Demo Diagnostic Laboratory',
+        logo_url: null,
+        theme_color: '#10b981',
+        category: 'Laboratory',
+        questions: [
+          "Did you receive your laboratory test reports within the promised time?",
+          "Was the laboratory clean, hygienic and well-maintained?",
+          "Were the reception and support staff friendly and helpful throughout your visit?",
+          "Did the laboratory staff make you feel comfortable and relaxed during blood collection and other tests?"
+        ],
+        services: [
+          "Blood Tests",
+          "Urine Tests",
+          "Diabetes Tests",
+          "Full Body Checkup",
+          "Health Packages",
+          "ECG Test",
+          "X-Ray",
+          "Ultrasound Scan",
+          "Sample Collection at Home",
+          "Hormone Tests",
+          "Vitamin Tests",
+          "Microbiology Tests",
+          "Liver Function Test",
+          "Lipid Profile",
+          "Thyroid Test",
+          "Kidney Function Test",
+          "Pathology Tests",
+          "Other"
+        ]
+      };
+      setInstituteData(mockData);
+      document.documentElement.style.setProperty('--primary-color', mockData.theme_color);
+      setLoading(false);
+      return;
+    }
+
     // Fetch real institute data from backend
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
     axios.get(`${API_URL}/api/v1/institute-flow/institute/${qr_identifier}`)
@@ -248,16 +352,30 @@ function InstituteFlowWrapper() {
       {/* Main Content Area */}
       <div className="flex-1 p-6 flex flex-col relative z-0">
         {step === 'feedback' && (
-          <InstituteFeedbackForm 
-            instituteId={instituteData.id}
-            category={instituteData.category}
-            services={instituteData.services || []}
-            questions={instituteData.questions}
-            onComplete={(result) => {
-              setFeedbackResult(result);
-              setStep('result');
-            }}
-          />
+          instituteData.category === 'Laboratory' ? (
+            <LaboratoryFeedbackForm 
+              instituteId={instituteData.id}
+              clinicName={instituteData.name}
+              isInstitute={true}
+              questions={Array.isArray(instituteData.questions) ? instituteData.questions : undefined}
+              services={instituteData.services || []}
+              onComplete={(result) => {
+                setFeedbackResult(result);
+                setStep('result');
+              }}
+            />
+          ) : (
+            <InstituteFeedbackForm 
+              instituteId={instituteData.id}
+              category={instituteData.category}
+              services={instituteData.services || []}
+              questions={instituteData.questions}
+              onComplete={(result) => {
+                setFeedbackResult(result);
+                setStep('result');
+              }}
+            />
+          )
         )}
         {step === 'result' && (
           <ResultScreen result={feedbackResult} />
