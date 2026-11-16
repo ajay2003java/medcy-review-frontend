@@ -45,6 +45,7 @@ function ClinicFlowWrapper() {
   const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
+    setImageError(false);
     // If it's a demo route, we mock the backend response instantly!
     if (qr_identifier?.startsWith('demo-')) {
       const categoryStr = qr_identifier.replace('demo-', '');
@@ -269,6 +270,7 @@ function InstituteFlowWrapper() {
   const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
+    setImageError(false);
     // If it's a demo route for laboratory
     if (qr_identifier === 'demo-laboratory') {
       const mockData = {

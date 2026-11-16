@@ -11,6 +11,57 @@ interface Clinic {
   theme_color: string;
 }
 
+function LogoUrlInput({ 
+  value, 
+  onChange, 
+  placeholder = "https://example.com/logo.png or Kommodo link" 
+}: { 
+  value: string; 
+  onChange: (val: string) => void; 
+  placeholder?: string;
+}) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">Logo URL (Optional)</label>
+      <input 
+        type="url" 
+        value={value || ''} 
+        onChange={e => onChange(e.target.value)} 
+        className="w-full border-gray-300 rounded-xl shadow-sm focus:ring-primary focus:border-primary p-3 bg-gray-50" 
+        placeholder={placeholder} 
+      />
+      {value && (
+        <div className="mt-2 p-2.5 bg-gray-50 border border-gray-200 rounded-xl flex items-center space-x-3">
+          <img 
+            src={value} 
+            alt="Logo preview" 
+            className="h-10 w-10 object-contain rounded-lg border bg-white p-1"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).style.display = 'none';
+            }}
+            onLoad={(e) => {
+              (e.currentTarget as HTMLImageElement).style.display = 'block';
+            }}
+          />
+          <div className="text-xs text-gray-600">
+            {value.includes('kommodo') || value.includes('komodo') ? (
+              <span className="text-emerald-700 font-semibold block">
+                ⚡ Kommodo link detected: Backend will automatically extract the raw image URL on save.
+              </span>
+            ) : value.includes('drive.google.com') ? (
+              <span className="text-emerald-700 font-semibold block">
+                ⚡ Google Drive link detected: Backend will automatically convert to direct image stream.
+              </span>
+            ) : (
+              <span className="text-gray-500">Image preview. Direct image URLs (.png, .jpg) recommended.</span>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<'clinics' | 'add-clinic' | 'labs' | 'add-lab' | 'institutes' | 'add-institute' | 'feedback'>('clinics');
   const [clinics, setClinics] = useState<Clinic[]>([]);
@@ -294,10 +345,10 @@ export default function AdminDashboard() {
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Logo URL (Optional)</label>
-                  <input type="url" value={formData.logo_url || ''} onChange={e => setFormData({...formData, logo_url: e.target.value})} className="w-full border-gray-300 rounded-xl shadow-sm focus:ring-primary focus:border-primary p-3 bg-gray-50" placeholder="https://example.com/logo.png" />
-                </div>
+                <LogoUrlInput 
+                  value={formData.logo_url} 
+                  onChange={val => setFormData({...formData, logo_url: val})} 
+                />
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Google Review URL</label>
@@ -383,10 +434,10 @@ export default function AdminDashboard() {
                   <input type="text" disabled value="Laboratory (Diagnostic & Pathology)" className="w-full border-gray-300 rounded-xl shadow-sm p-3 bg-gray-100 text-gray-600 cursor-not-allowed" />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Logo URL (Optional)</label>
-                  <input type="url" value={labFormData.logo_url || ''} onChange={e => setLabFormData({...labFormData, logo_url: e.target.value})} className="w-full border-gray-300 rounded-xl shadow-sm focus:ring-primary focus:border-primary p-3 bg-gray-50" placeholder="https://example.com/logo.png" />
-                </div>
+                <LogoUrlInput 
+                  value={labFormData.logo_url} 
+                  onChange={val => setLabFormData({...labFormData, logo_url: val})} 
+                />
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Google Review URL</label>
@@ -477,10 +528,10 @@ export default function AdminDashboard() {
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Logo URL (Optional)</label>
-                  <input type="url" value={instituteFormData.logo_url || ''} onChange={e => setInstituteFormData({...instituteFormData, logo_url: e.target.value})} className="w-full border-gray-300 rounded-xl shadow-sm focus:ring-primary focus:border-primary p-3 bg-gray-50" placeholder="https://example.com/logo.png" />
-                </div>
+                <LogoUrlInput 
+                  value={instituteFormData.logo_url} 
+                  onChange={val => setInstituteFormData({...instituteFormData, logo_url: val})} 
+                />
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Google Review URL</label>
