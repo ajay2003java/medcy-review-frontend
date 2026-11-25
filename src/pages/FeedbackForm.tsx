@@ -6,7 +6,10 @@ import { generateDynamicReview } from '../utils/reviewGenerator';
 interface Props {
   clinicId: string;
   clinicName?: string;
+  doctorName?: string;
+  specialty?: string;
   category?: string;
+  isInstitute?: boolean;
   questions: string[];
   services?: string[];
   onComplete: (result: any) => void;
@@ -48,7 +51,17 @@ const TRANSLATIONS: Record<string, Record<'en'|'te', string>> = {
   "Were you seen by a doctor within a reasonable waiting time?": { en: "Were you seen by a doctor within a reasonable waiting time?", te: "తక్కువ నిరీక్షణ సమయంలో మీరు వైద్యునిచే చూడబడ్డారా?" },
   "Did you feel well taken care of by the nursing and medical staff?": { en: "Did you feel well taken care of by the nursing and medical staff?", te: "నర్సింగ్ మరియు వైద్య సిబ్బంది మిమ్మల్ని బాగా చూసుకున్నారని మీరు భావించారా?" },
   "Was the admission and discharge process smooth?": { en: "Was the admission and discharge process smooth?", te: "అడ్మిషన్ మరియు డిశ్చార్జ్ ప్రక్రియ సజావుగా జరిగిందా?" },
-  "Did you find the hospital rooms and facilities completely clean?": { en: "Did you find the hospital rooms and facilities completely clean?", te: "ఆసుపత్రి గదులు మరియు సౌకర్యాలు పూర్తిగా శుభ్రంగా ఉన్నాయా?" }
+  "Did you find the hospital rooms and facilities completely clean?": { en: "Did you find the hospital rooms and facilities completely clean?", te: "ఆసుపత్రి గదులు మరియు సౌకర్యాలు పూర్తిగా శుభ్రంగా ఉన్నాయా?" },
+  // Dr. Kishore (Orthopedics)
+  "Were you satisfied with Dr. Kishore's orthopedic consultation and treatment plan?": { en: "Were you satisfied with Dr. Kishore's orthopedic consultation and treatment plan?", te: "డాక్టర్ కిషోర్ గారి ఆర్థోపెడిక్ సంప్రదింపులు మరియు చికిత్స ప్రణాళికతో మీరు సంతృప్తి చెందారా?" },
+  "Did the doctor explain your diagnosis and recovery clearly?": { en: "Did the doctor explain your diagnosis and recovery clearly?", te: "వైద్యులు మీ సమస్య మరియు కోలుకునే విధానాన్ని స్పష్టంగా వివరించారా?" },
+  "Was the clinic environment clean, hygienic and well-maintained?": { en: "Was the clinic environment clean, hygienic and well-maintained?", te: "క్లినిక్ వాతావరణం పరిశుభ్రంగా మరియు చక్కగా నిర్వహించబడిందా?" },
+  "Did the doctor listen attentively to your pain concerns and perform a thorough examination?": { en: "Did the doctor listen attentively to your pain concerns and perform a thorough examination?", te: "వైద్యులు మీ నొప్పి సమస్యలను శ్రద్ధగా విని, సమగ్రంగా పరీక్షించారా?" },
+  // Dr. Bhavana (Pediatrics)
+  "Did Dr. Bhavana make your child feel comfortable and well-cared for during the visit?": { en: "Did Dr. Bhavana make your child feel comfortable and well-cared for during the visit?", te: "సందర్శన సమయంలో డాక్టర్ భావన గారు మీ బిడ్డను సౌకర్యంగా మరియు శ్రద్ధగా చూసుకున్నారా?" },
+  "Did the doctor explain your child's diagnosis and treatment clearly?": { en: "Did the doctor explain your child's diagnosis and treatment clearly?", te: "వైద్యులు మీ బిడ్డ ఆరోగ్య పరిస్థితి మరియు చికిత్సను స్పష్టంగా వివరించారా?" },
+  "Was the clinic environment child-friendly, clean and hygienic?": { en: "Was the clinic environment child-friendly, clean and hygienic?", te: "క్లినిక్ వాతావరణం పిల్లలకు అనుకూలంగా, పరిశుభ్రంగా మరియు ఆహ్లాదకరంగా ఉందా?" },
+  "Were the reception and nursing staff gentle, polite and helpful?": { en: "Were the reception and nursing staff gentle, polite and helpful?", te: "రిసెప్షన్ మరియు నర్సింగ్ సిబ్బంది మృదువుగా, మర్యాదగా మరియు సహాయకారిగా ఉన్నారా?" }
 };
 
 const FaceIcon = ({ type, active }: { type: 1|2|3|4|5, active: boolean }) => {
@@ -83,7 +96,10 @@ const RATING_OPTIONS = [
 export default function FeedbackForm({
   clinicId,
   clinicName,
+  doctorName,
+  specialty,
   category,
+  isInstitute = false,
   questions,
   services = [],
   onComplete
@@ -117,8 +133,10 @@ export default function FeedbackForm({
     if (!canSubmit) return;
     setLoading(true);
 
-    // Mock response for Demo Mode so the frontend test generates dynamic unique SEO reviews instantly
-    if (clinicId.startsWith('demo-')) {
+    const isDemo = clinicId.startsWith('demo-') || clinicId === 'kishore' || clinicId === 'bhavana';
+
+    // Mock response for Demo/Preview Mode so frontend tests generate dynamic unique SEO reviews instantly
+    if (isDemo) {
       setTimeout(() => {
         const isPositive = averageRating >= 4;
         const catStr = category || clinicId.replace('demo-', '');
@@ -127,14 +145,20 @@ export default function FeedbackForm({
           ? generateDynamicReview({
               clinicName: targetName,
               category: catStr,
-              serviceReceived: selectedService || null
+              serviceReceived: selectedService || null,
+              doctorName: doctorName || null
             })
           : null;
+
+        // Equal opportunity: always provide google_url
+        const gUrl = (clinicId === 'kishore' || clinicId === 'bhavana')
+          ? "https://search.google.com/local/writereview?placeid=ChIJ_kishore_bhavana_clinic"
+          : "https://g.page/r/demo";
 
         onComplete({
           action_flow: isPositive ? 'POSITIVE' : 'PRIVATE',
           generated_review_draft: dynamicDraft,
-          google_url: isPositive ? 'https://google.com' : null
+          google_url: gUrl
         });
         setLoading(false);
       }, 700);
@@ -143,12 +167,18 @@ export default function FeedbackForm({
 
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-      const res = await axios.post(`${API_URL}/api/v1/patient/feedback`, {
+      const endpoint = isInstitute
+        ? `${API_URL}/api/v1/institute-flow/feedback`
+        : `${API_URL}/api/v1/patient/feedback`;
+
+      const res = await axios.post(endpoint, {
         clinic_id: clinicId,
+        institute_id: clinicId,
         rating_score: averageRating,
         private_feedback: privateFeedback,
         service_received: selectedService || null,
         clinic_name: clinicName || null,
+        doctor_name: doctorName || null,
         category: category || null
       });
       onComplete(res.data);
@@ -160,6 +190,18 @@ export default function FeedbackForm({
 
   return (
     <div className="flex flex-col flex-1 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-md mx-auto w-full">
+      {/* Doctor Badge if applicable */}
+      {doctorName && (
+        <div className="mb-4 bg-white border border-primary/20 rounded-2xl p-3.5 px-4 flex items-center justify-between shadow-xs">
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-primary">Doctor Consultation</p>
+            <p className="text-sm font-bold text-gray-800">{doctorName} {specialty ? `• ${specialty}` : ''}</p>
+          </div>
+          <span className="text-[11px] font-semibold px-2.5 py-1 bg-primary/10 text-primary rounded-full">
+            {category || 'Doctor'}
+          </span>
+        </div>
+      )}
       
       {/* Language Toggle */}
       <div className="flex justify-end mb-4 px-1">

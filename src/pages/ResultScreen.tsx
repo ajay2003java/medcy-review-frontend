@@ -36,9 +36,23 @@ export default function ResultScreen({ result }: Props) {
           <Heart className="h-16 w-16 text-gray-400" />
         </div>
         <h2 className="text-2xl font-bold text-gray-800 mb-3">Thank You</h2>
-        <p className="text-gray-500 mb-8 max-w-xs mx-auto">
+        <p className="text-gray-500 mb-6 max-w-xs mx-auto">
           We appreciate your honest feedback. Our management team will review this to improve our care.
         </p>
+
+        {result.google_url && (
+          <div className="w-full mt-4 pt-6 border-t border-gray-100">
+            <p className="text-xs text-gray-400 mb-3">
+              You are also welcome to share your honest review publicly on Google.
+            </p>
+            <button
+              onClick={() => window.open(result.google_url, '_blank', 'noopener,noreferrer')}
+              className="w-full bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3.5 px-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-center text-sm transition-all active:scale-[0.98]"
+            >
+              Post Review on Google <ExternalLink className="ml-2 h-4 w-4 text-gray-500" />
+            </button>
+          </div>
+        )}
       </div>
     );
   }

@@ -18,6 +18,8 @@ export interface ClinicContextData {
   category: string;
   questions: string[];
   services: string[];
+  doctor_name?: string | null;
+  specialty?: string | null;
 }
 
 export default function App() {
@@ -45,7 +47,48 @@ function ClinicFlowWrapper() {
   const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
+<<<<<<< HEAD
     setImageError(false);
+=======
+    // If it's Dr. Kishore or Dr. Bhavana
+    if (qr_identifier === 'kishore' || qr_identifier === 'bhavana') {
+      const isKishore = qr_identifier === 'kishore';
+      const doctorData: ClinicContextData = {
+        id: 'b0101010-b010-b010-b010-b01010101010',
+        name: 'Kishore Bhavana Clinic',
+        doctor_name: isKishore ? 'Dr. Kishore' : 'Dr. Bhavana',
+        specialty: isKishore ? 'Orthopedician' : 'Pediatrician',
+        category: isKishore ? 'Orthopedics' : 'Pediatrics',
+        theme_color: '#0284c7',
+        logo_url: null,
+        questions: isKishore ? [
+          "Were you satisfied with Dr. Kishore's orthopedic consultation and treatment plan?",
+          "Did the doctor explain your diagnosis and recovery clearly?",
+          "Was the clinic environment clean, hygienic and well-maintained?",
+          "Did the doctor listen attentively to your pain concerns and perform a thorough examination?"
+        ] : [
+          "Did Dr. Bhavana make your child feel comfortable and well-cared for during the visit?",
+          "Did the doctor explain your child's diagnosis and treatment clearly?",
+          "Was the clinic environment child-friendly, clean and hygienic?",
+          "Were the reception and nursing staff gentle, polite and helpful?"
+        ],
+        services: isKishore ? [
+          "Joint & Knee Pain", "Fracture Care", "Spine & Back Care",
+          "Arthritis Treatment", "Sports Injury", "Bone Density Check",
+          "General Orthopedic Consultation"
+        ] : [
+          "Child Vaccination", "Newborn & Infant Care", "Growth & Nutrition",
+          "Fever & Infection Care", "Asthma & Allergy Care", "Child Health Checkup",
+          "General Pediatric Consultation"
+        ]
+      };
+      setClinicData(doctorData);
+      document.documentElement.style.setProperty('--primary-color', doctorData.theme_color);
+      setLoading(false);
+      return;
+    }
+
+>>>>>>> 2b861d1 (kishorebhavanaclinic)
     // If it's a demo route, we mock the backend response instantly!
     if (qr_identifier?.startsWith('demo-')) {
       const categoryStr = qr_identifier.replace('demo-', '');
@@ -219,6 +262,11 @@ function ClinicFlowWrapper() {
             {clinicData.name.charAt(0)}
           </div>
           <h1 className="text-xl font-bold text-center tracking-tight">{clinicData.name}</h1>
+          {clinicData.doctor_name && (
+            <p className="text-xs text-white/90 font-medium mt-1">
+              {clinicData.doctor_name} • {clinicData.specialty}
+            </p>
+          )}
         </div>
       )}
 
@@ -240,6 +288,8 @@ function ClinicFlowWrapper() {
             <FeedbackForm 
               clinicId={clinicData.id}
               clinicName={clinicData.name}
+              doctorName={clinicData.doctor_name || undefined}
+              specialty={clinicData.specialty || undefined}
               category={clinicData.category}
               questions={clinicData.questions}
               services={clinicData.services}
@@ -270,7 +320,51 @@ function InstituteFlowWrapper() {
   const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
+<<<<<<< HEAD
     setImageError(false);
+=======
+    // If it's Dr. Kishore or Dr. Bhavana
+    if (qr_identifier === 'kishore' || qr_identifier === 'bhavana') {
+      const isKishore = qr_identifier === 'kishore';
+      const doctorData = {
+        id: 'b0101010-b010-b010-b010-b01010101010',
+        clinic_id: 'b0101010-b010-b010-b010-b01010101010',
+        name: 'Kishore Bhavana Clinic',
+        doctor_name: isKishore ? 'Dr. Kishore' : 'Dr. Bhavana',
+        specialty: isKishore ? 'Orthopedician' : 'Pediatrician',
+        category: isKishore ? 'Orthopedics' : 'Pediatrics',
+        theme_color: '#0284c7',
+        logo_url: null,
+        google_review_url: 'https://search.google.com/local/writereview?placeid=ChIJ_kishore_bhavana_clinic',
+        isDoctorClinic: true,
+        questions: isKishore ? [
+          "Were you satisfied with Dr. Kishore's orthopedic consultation and treatment plan?",
+          "Did the doctor explain your diagnosis and recovery clearly?",
+          "Was the clinic environment clean, hygienic and well-maintained?",
+          "Did the doctor listen attentively to your pain concerns and perform a thorough examination?"
+        ] : [
+          "Did Dr. Bhavana make your child feel comfortable and well-cared for during the visit?",
+          "Did the doctor explain your child's diagnosis and treatment clearly?",
+          "Was the clinic environment child-friendly, clean and hygienic?",
+          "Were the reception and nursing staff gentle, polite and helpful?"
+        ],
+        services: isKishore ? [
+          "Joint & Knee Pain", "Fracture Care", "Spine & Back Care",
+          "Arthritis Treatment", "Sports Injury", "Bone Density Check",
+          "General Orthopedic Consultation"
+        ] : [
+          "Child Vaccination", "Newborn & Infant Care", "Growth & Nutrition",
+          "Fever & Infection Care", "Asthma & Allergy Care", "Child Health Checkup",
+          "General Pediatric Consultation"
+        ]
+      };
+      setInstituteData(doctorData);
+      document.documentElement.style.setProperty('--primary-color', doctorData.theme_color);
+      setLoading(false);
+      return;
+    }
+
+>>>>>>> 2b861d1 (kishorebhavanaclinic)
     // If it's a demo route for laboratory
     if (qr_identifier === 'demo-laboratory') {
       const mockData = {
@@ -348,6 +442,11 @@ function InstituteFlowWrapper() {
             {instituteData.name.charAt(0)}
           </div>
           <h1 className="text-xl font-bold text-center tracking-tight">{instituteData.name}</h1>
+          {instituteData.doctor_name && (
+            <p className="text-xs text-white/90 font-medium mt-1">
+              {instituteData.doctor_name} • {instituteData.specialty}
+            </p>
+          )}
         </div>
       )}
 
@@ -361,6 +460,21 @@ function InstituteFlowWrapper() {
               isInstitute={true}
               questions={Array.isArray(instituteData.questions) ? instituteData.questions : undefined}
               services={instituteData.services || []}
+              onComplete={(result) => {
+                setFeedbackResult(result);
+                setStep('result');
+              }}
+            />
+          ) : instituteData.isDoctorClinic || instituteData.doctor_name ? (
+            <FeedbackForm 
+              clinicId={instituteData.clinic_id || instituteData.id}
+              clinicName={instituteData.name}
+              doctorName={instituteData.doctor_name}
+              specialty={instituteData.specialty}
+              category={instituteData.category}
+              questions={instituteData.questions}
+              services={instituteData.services}
+              isInstitute={true}
               onComplete={(result) => {
                 setFeedbackResult(result);
                 setStep('result');

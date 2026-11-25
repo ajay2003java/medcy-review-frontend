@@ -2,10 +2,13 @@ export interface ReviewGeneratorParams {
   clinicName: string;
   category: string;
   serviceReceived?: string | null;
+  doctorName?: string | null;
 }
 
 function normalizeCategory(category: string): string {
   const cat = category.toLowerCase().replace(/[-_]/g, ' ');
+  if (cat.includes('ortho') || cat.includes('bone') || cat.includes('joint')) return 'Orthopedics';
+  if (cat.includes('pedia') || cat.includes('child')) return 'Pediatrics';
   if (cat.includes('dermatol') || cat.includes('skin')) return 'Dermatology';
   if (cat.includes('ivf') || cat.includes('fertil')) return 'IVF';
   if (cat.includes('gynec') || cat.includes('matern') || cat.includes('women')) return 'Gynecology';
@@ -15,18 +18,56 @@ function normalizeCategory(category: string): string {
   return category;
 }
 
-function cleanServicePhrase(service?: string | null): string {
+function formatServicePhrase(service?: string | null): string {
   if (!service) return '';
   let s = service.trim();
   if (s.toLowerCase().startsWith('other:')) {
     s = s.substring(6).trim();
   }
   if (!s) return '';
-  const parts = s.split(',').map(p => p.trim()).filter(Boolean);
-  if (parts.length === 1) return parts[0];
-  if (parts.length === 2) return `${parts[0]} and ${parts[1]}`;
-  if (parts.length > 2) return `${parts.slice(0, -1).join(', ')}, and ${parts[parts.length - 1]}`;
-  return s;
+  const rawParts = s.split(',').map(p => p.trim()).filter(Boolean);
+  const formatted = rawParts.map(part => {
+    const l = part.toLowerCase();
+    if (l === 'newborn & infant care') return 'newborn and infant care';
+    if (l === 'child vaccination') return "our child's vaccination";
+    if (l === 'growth & nutrition') return 'child growth and nutrition';
+    if (l === 'fever & infection care') return 'fever and infection care';
+    if (l === 'asthma & allergy care') return 'asthma and allergy care';
+    if (l === 'child health checkup') return 'a routine child checkup';
+    if (l === 'general pediatric consultation') return 'pediatric consultation';
+    if (l === 'joint & knee pain') return 'joint and knee pain';
+    if (l === 'fracture care') return 'fracture care';
+    if (l === 'spine & back care') return 'spine and back care';
+    if (l === 'arthritis treatment') return 'arthritis care';
+    if (l === 'sports injury') return 'a sports injury';
+    if (l === 'bone density check') return 'a bone density check';
+    if (l === 'general orthopedic consultation') return 'orthopedic consultation';
+    if (l === 'full body checkup') return 'a full body checkup';
+    if (l === 'health packages') return 'a comprehensive health checkup package';
+    if (l === 'blood tests') return 'blood tests';
+    if (l === 'urine tests') return 'urine tests';
+    if (l === 'thyroid profile') return 'a thyroid profile test';
+    if (l === 'diabetes tests') return 'diabetes testing';
+    if (l === 'lipid profile') return 'a lipid profile test';
+    if (l === 'liver function test') return 'a liver function test';
+    if (l === 'kidney function test') return 'a kidney function test';
+    if (l === 'hormone tests') return 'hormone tests';
+    if (l === 'vitamin tests') return 'vitamin tests';
+    if (l === 'microbiology tests') return 'microbiology tests';
+    if (l === 'pathology tests') return 'pathology tests';
+    if (l === 'ecg test') return 'an ECG test';
+    if (l === 'x-ray') return 'an X-ray';
+    if (l === 'ultrasound scan') return 'an ultrasound scan';
+    if (l === 'sample collection at home') return 'home sample collection';
+    return part.toLowerCase();
+  });
+
+  let joined = '';
+  if (formatted.length === 1) joined = formatted[0];
+  else if (formatted.length === 2) joined = `${formatted[0]} and ${formatted[1]}`;
+  else joined = `${formatted.slice(0, -1).join(', ')}, and ${formatted[formatted.length - 1]}`;
+
+  return joined ? ` for ${joined}` : '';
 }
 
 function pickRandom<T>(arr: T[]): T {
@@ -237,23 +278,162 @@ const CATEGORY_SEO_TEMPLATES: Record<string, { openers: string[]; middles: strin
       "World-class doctors, clean hospital premises, and caring nurses. Highly recommend {clinicName}!",
       "Top-tier hospital with dedicated medical professionals. Truly grateful to {clinicName}."
     ]
+  },
+  'Orthopedics': {
+    openers: [
+      "I visited {clinicName}{servicePhrase} and received outstanding orthopedic care.",
+      "If you are looking for the best orthopedician, {clinicName} is the top choice.",
+      "Consulting {clinicName}{servicePhrase} was one of the best healthcare decisions for my joint and bone health.",
+      "Had an exceptional experience at {clinicName}{servicePhrase} with quick relief from pain.",
+      "I highly recommend {clinicName}{servicePhrase} for anyone dealing with bone, joint, or spine issues.",
+      "My consultation at {clinicName}{servicePhrase} was smooth, reassuring, and gave me great results.",
+      "Hands down the top orthopedic clinic in town — {clinicName} provides world-class care.",
+      "From check-in to examination, my experience at {clinicName}{servicePhrase} was top-tier."
+    ],
+    middles: [
+      "The orthopedic diagnosis was accurate and the treatment plan was explained with immense clarity and practical recovery steps.",
+      "The doctors were extremely patient, gentle during examinations, and focused on lasting joint mobility and strength.",
+      "The clinic is spotless, hygienic, and equipped with modern orthopedic examination facilities.",
+      "The supportive staff ensured a smooth, comfortable consultation without any unnecessary waiting time.",
+      "I noticed significant improvement in my movement and pain relief much sooner than expected.",
+      "Every step of the treatment and home exercises was explained with genuine care and patience."
+    ],
+    closers: [
+      "Easily the best orthopedic clinic in town — 5 stars for {clinicName}!",
+      "I wholeheartedly recommend {clinicName} for reliable and compassionate orthopedic treatment.",
+      "Outstanding bone and joint care with a personal touch. Thank you, {clinicName}!",
+      "Will always trust {clinicName} for any future orthopedic needs. 10/10!",
+      "Top-notch orthopedic treatment and wonderful staff. Highly recommended!"
+    ]
+  },
+  'Pediatrics': {
+    openers: [
+      "I brought my child to {clinicName}{servicePhrase} and had a wonderful experience.",
+      "If you are searching for the best pediatrician, {clinicName} is second to none.",
+      "Consulting the pediatric specialists at {clinicName}{servicePhrase} was an incredibly reassuring experience for our family.",
+      "Had a great pediatric visit at {clinicName}{servicePhrase} with gentle, caring attention.",
+      "We cannot thank the doctors at {clinicName} enough for taking such wonderful care of our child{servicePhrase}.",
+      "Visiting {clinicName}{servicePhrase} made my child completely comfortable and happy.",
+      "Hands down the top children's clinic in town — {clinicName} is simply the best.",
+      "My experience at {clinicName}{servicePhrase} exceeded all expectations for pediatric care."
+    ],
+    middles: [
+      "The pediatrician was so gentle, patient, and made my child feel completely safe and at ease throughout the checkup.",
+      "The doctor explained the diagnosis, nutrition, and vaccination schedule with great patience and clarity.",
+      "The clinic environment is clean, child-friendly, hygienic, and very welcoming for families.",
+      "The nursing staff was so polite, welcoming, and handled the procedures with extreme tenderness.",
+      "We received practical guidance on child development and healthy recovery with genuine care.",
+      "The doctor listened attentively to all our parenting questions without rushing."
+    ],
+    closers: [
+      "Easily the best pediatrician and child clinic around — 5 stars for {clinicName}!",
+      "I strongly recommend {clinicName} to every parent seeking the best care for their children.",
+      "A trustworthy child clinic with truly compassionate doctors. Thank you, {clinicName}!",
+      "10/10 recommendation for {clinicName} — the most caring pediatricians in the city.",
+      "Wonderful experience for my little one. Look no further than {clinicName} for child healthcare!"
+    ]
   }
 };
 
-export function generateDynamicReview({ clinicName, category, serviceReceived }: ReviewGeneratorParams): string {
-  const normalizedCat = normalizeCategory(category);
-  const template = CATEGORY_SEO_TEMPLATES[normalizedCat] || CATEGORY_SEO_TEMPLATES['General Hospital'];
+const DOCTOR_SEO_TEMPLATES: Record<string, { openers: string[]; middles: string[]; closers: string[] }> = {
+  'Pediatrics': {
+    openers: [
+      "I brought my child to {clinicName}{servicePhrase} and consulted {doctorName}.",
+      "If you are searching for the best pediatrician, {doctorName} at {clinicName} is second to none.",
+      "Consulting {doctorName} at {clinicName}{servicePhrase} was an incredibly reassuring experience for our family.",
+      "Had a wonderful pediatric visit with {doctorName} at {clinicName}{servicePhrase}.",
+      "Visiting {clinicName} to consult {doctorName}{servicePhrase} was the best healthcare decision for our little one.",
+      "{doctorName} at {clinicName} provides truly compassionate, top-tier pediatric care{servicePhrase}.",
+      "From the moment we arrived at {clinicName}{servicePhrase}, {doctorName} treated our child with exceptional warmth and care.",
+      "I booked an appointment with {doctorName} at {clinicName}{servicePhrase} and the experience was truly five-star."
+    ],
+    middles: [
+      "{doctorName} was remarkably gentle, patient, and made our little one feel completely safe throughout the checkup.",
+      "{doctorName} listened attentively to all our parenting questions without rushing and explained the diagnosis with great clarity.",
+      "The clinic is spotlessly clean, child-friendly, and {doctorName}'s calm bedside manner instantly put our baby at ease.",
+      "{doctorName} gave us clear guidance on medication, nutrition, and recovery steps that worked wonders for our child.",
+      "The nursing staff was polite and caring, and {doctorName}'s thorough examination gave our family complete peace of mind.",
+      "We truly appreciate how {doctorName} took the time to answer every doubt with immense patience and medical expertise."
+    ],
+    closers: [
+      "Easily the best child specialist in town — 5 stars for {doctorName} and {clinicName}!",
+      "I strongly recommend {doctorName} to every parent seeking the best, most compassionate care for their children.",
+      "A truly wonderful child clinic with dedicated doctors. Thank you, {doctorName} and {clinicName}!",
+      "10/10 recommendation for {clinicName} — {doctorName} is our family's most trusted child specialist.",
+      "Heartfelt gratitude to {doctorName} and the team at {clinicName} for their fantastic support.",
+      "Wonderful experience for our little one. Look no further than {clinicName} for pediatric care!"
+    ]
+  },
+  'Orthopedics': {
+    openers: [
+      "I consulted {doctorName} at {clinicName}{servicePhrase} and received outstanding orthopedic care.",
+      "If you are looking for an experienced and trustworthy orthopedician, {doctorName} at {clinicName} is the top choice.",
+      "Visiting {clinicName} to consult {doctorName}{servicePhrase} was one of the best healthcare decisions I have made.",
+      "Had an exceptional consultation with {doctorName} at {clinicName}{servicePhrase} and experienced prompt pain relief.",
+      "{doctorName} at {clinicName} provides top-tier orthopedic diagnosis and evidence-based treatment{servicePhrase}.",
+      "My experience consulting {doctorName} at {clinicName}{servicePhrase} was smooth, reassuring, and gave me great recovery results.",
+      "Hands down the top orthopedic specialist around — {doctorName} at {clinicName} provides world-class bone and joint care.",
+      "I booked an appointment with {doctorName} at {clinicName}{servicePhrase} and the clinical attention was remarkable."
+    ],
+    middles: [
+      "{doctorName} listened attentively to my pain concerns, performed a thorough physical examination, and explained the root cause clearly.",
+      "{doctorName} took the time to explain my recovery roadmap without rushing into unnecessary tests or procedures.",
+      "The clinic is modern, hygienic, and {doctorName}'s personalized treatment and exercise guidance helped restore my mobility rapidly.",
+      "I felt completely reassured by {doctorName}'s clinical expertise, honest advice, and warm, patient demeanor.",
+      "Every step of my recovery plan and medication was explained with immense clarity and practical daily care tips.",
+      "The supportive staff ensured a prompt consultation and {doctorName} addressed all my questions with genuine care."
+    ],
+    closers: [
+      "Easily the best orthopedic doctor in town — 5 stars for {doctorName} and {clinicName}!",
+      "I wholeheartedly recommend {doctorName} to anyone dealing with joint, spine, or bone pain.",
+      "A dedicated orthopedic specialist who truly cares about patient recovery. Thank you, {doctorName}!",
+      "10/10 recommendation for {clinicName} — {doctorName} gave me lasting pain relief and renewed mobility.",
+      "Outstanding clinical care with a personal touch. Will always trust {doctorName} and {clinicName} for orthopedic needs.",
+      "Top-notch orthopedic care and wonderful clinic environment. Highly recommended!"
+    ]
+  },
+  'General': {
+    openers: [
+      "I consulted {doctorName} at {clinicName}{servicePhrase} and received outstanding medical care.",
+      "Visiting {clinicName} to see {doctorName}{servicePhrase} was a reassuring and positive healthcare experience.",
+      "{doctorName} at {clinicName} is an exceptional doctor who truly prioritizes patient wellbeing{servicePhrase}.",
+      "Had a wonderful consultation with {doctorName} at {clinicName}{servicePhrase}."
+    ],
+    middles: [
+      "{doctorName} was thorough, attentive, and explained the entire treatment plan with great clarity.",
+      "The clinic is clean, well-managed, and {doctorName} took adequate time to answer all my questions.",
+      "{doctorName}'s compassionate bedside manner and clinical expertise gave me complete confidence."
+    ],
+    closers: [
+      "Easily a 5-star experience — highly recommend {doctorName} and {clinicName}!",
+      "I wholeheartedly recommend {doctorName} to anyone seeking trustworthy medical advice.",
+      "Thank you to {doctorName} and the staff at {clinicName} for their wonderful care!"
+    ]
+  }
+};
 
-  const cleanService = cleanServicePhrase(serviceReceived);
-  const servicePhrase = cleanService ? ` for my ${cleanService}` : '';
+export function generateDynamicReview({ clinicName, category, serviceReceived, doctorName }: ReviewGeneratorParams): string {
+  const normalizedCat = normalizeCategory(category);
+  const servicePhrase = formatServicePhrase(serviceReceived);
+
+  const hasDoctor = Boolean(doctorName && doctorName.trim());
+  const template = hasDoctor
+    ? (DOCTOR_SEO_TEMPLATES[normalizedCat] || DOCTOR_SEO_TEMPLATES['General'])
+    : (CATEGORY_SEO_TEMPLATES[normalizedCat] || CATEGORY_SEO_TEMPLATES['General Hospital']);
 
   const openerRaw = pickRandom(template.openers);
   const middleRaw = pickRandom(template.middles);
   const closerRaw = pickRandom(template.closers);
 
-  const opener = openerRaw.replace(/{clinicName}/g, clinicName).replace(/{servicePhrase}/g, servicePhrase);
-  const middle = middleRaw.replace(/{clinicName}/g, clinicName).replace(/{servicePhrase}/g, servicePhrase);
-  const closer = closerRaw.replace(/{clinicName}/g, clinicName).replace(/{servicePhrase}/g, servicePhrase);
+  const applyReplacements = (str: string) =>
+    str
+      .replace(/{clinicName}/g, clinicName)
+      .replace(/{doctorName}/g, (doctorName || '').trim())
+      .replace(/{servicePhrase}/g, servicePhrase);
+
+  const opener = applyReplacements(openerRaw);
+  const middle = applyReplacements(middleRaw);
+  const closer = applyReplacements(closerRaw);
 
   // 25% chance of punchy 2-sentence review vs 75% 3-sentence review
   if (Math.random() < 0.25) {
