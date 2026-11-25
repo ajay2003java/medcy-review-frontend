@@ -8,6 +8,7 @@ import ResultScreen from './pages/ResultScreen';
 import DemoPage from './pages/DemoPage';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Stethoscope } from 'lucide-react';
 
 // A simple global state for the clinic flow context
 export interface ClinicContextData {
@@ -40,6 +41,7 @@ function ClinicFlowWrapper() {
   const [clinicData, setClinicData] = useState<ClinicContextData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [selectedDoctor, setSelectedDoctor] = useState<'kishore' | 'bhavana' | null>(null);
 
   // Flow State
   const [step, setStep] = useState<'feedback' | 'result'>('feedback');
@@ -48,9 +50,10 @@ function ClinicFlowWrapper() {
 
   useEffect(() => {
     setImageError(false);
-    // If it's Dr. Kishore or Dr. Bhavana
-    if (qr_identifier === 'kishore' || qr_identifier === 'bhavana') {
-      const isKishore = qr_identifier === 'kishore';
+    // If it's Dr. Kishore or Dr. Bhavana (or generic reception QR with doctor chosen)
+    if (qr_identifier === 'kishore' || qr_identifier === 'bhavana' || (qr_identifier === 'kishore-bhavana' && selectedDoctor)) {
+      const activeDoc = selectedDoctor || qr_identifier;
+      const isKishore = activeDoc === 'kishore';
       const doctorData: ClinicContextData = {
         id: 'b0101010-b010-b010-b010-b01010101010',
         name: 'Kishore Bhavana Clinic',
@@ -82,6 +85,12 @@ function ClinicFlowWrapper() {
       };
       setClinicData(doctorData);
       document.documentElement.style.setProperty('--primary-color', doctorData.theme_color);
+      setLoading(false);
+      return;
+    }
+
+    if (qr_identifier === 'kishore-bhavana' && !selectedDoctor) {
+      document.documentElement.style.setProperty('--primary-color', '#0284c7');
       setLoading(false);
       return;
     }
@@ -235,10 +244,59 @@ function ClinicFlowWrapper() {
         setError('Clinic not found or deactivated.');
       })
       .finally(() => setLoading(false));
-  }, [qr_identifier]);
+  }, [qr_identifier, selectedDoctor]);
 
   if (loading) return <div className="flex h-screen items-center justify-center">Loading...</div>;
   if (error) return <div className="flex h-screen items-center justify-center text-red-500">{error}</div>;
+
+  if (qr_identifier === 'kishore-bhavana' && !selectedDoctor) {
+    return (
+      <div className="min-h-screen bg-gray-50 text-gray-900 font-sans max-w-md mx-auto shadow-xl relative overflow-hidden flex flex-col justify-center p-6">
+        <div className="bg-white rounded-3xl p-6 shadow-md border border-gray-100 text-center space-y-6">
+          <div className="w-16 h-16 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center mx-auto">
+            <Stethoscope className="w-8 h-8" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Kishore Bhavana Clinic</h2>
+            <p className="text-xs text-gray-500 mt-1">Please select which doctor you consulted today</p>
+          </div>
+          <div className="space-y-3">
+            <button
+              onClick={() => setSelectedDoctor('kishore')}
+              className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-sky-50 rounded-2xl border border-gray-200 hover:border-sky-300 transition-all text-left"
+            >
+              <div className="flex items-center space-x-3.5">
+                <div className="w-11 h-11 rounded-xl bg-sky-600 text-white flex items-center justify-center font-bold text-sm">
+                  DK
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-gray-800">Dr. Kishore</h4>
+                  <p className="text-xs text-gray-500">Orthopedician</p>
+                </div>
+              </div>
+              <span className="text-sky-600 font-semibold text-xs">Select &rarr;</span>
+            </button>
+            <button
+              onClick={() => setSelectedDoctor('bhavana')}
+              className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-pink-50 rounded-2xl border border-gray-200 hover:border-pink-300 transition-all text-left"
+            >
+              <div className="flex items-center space-x-3.5">
+                <div className="w-11 h-11 rounded-xl bg-pink-600 text-white flex items-center justify-center font-bold text-sm">
+                  DB
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-gray-800">Dr. Bhavana</h4>
+                  <p className="text-xs text-gray-500">Pediatrician</p>
+                </div>
+              </div>
+              <span className="text-pink-600 font-semibold text-xs">Select &rarr;</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!clinicData) return null;
 
   return (
@@ -310,6 +368,7 @@ function InstituteFlowWrapper() {
   const [instituteData, setInstituteData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [selectedDoctor, setSelectedDoctor] = useState<'kishore' | 'bhavana' | null>(null);
 
   // Flow State
   const [step, setStep] = useState<'feedback' | 'result'>('feedback');
@@ -319,8 +378,9 @@ function InstituteFlowWrapper() {
   useEffect(() => {
     setImageError(false);
     // If it's Dr. Kishore or Dr. Bhavana
-    if (qr_identifier === 'kishore' || qr_identifier === 'bhavana') {
-      const isKishore = qr_identifier === 'kishore';
+    if (qr_identifier === 'kishore' || qr_identifier === 'bhavana' || (qr_identifier === 'kishore-bhavana' && selectedDoctor)) {
+      const activeDoc = selectedDoctor || qr_identifier;
+      const isKishore = activeDoc === 'kishore';
       const doctorData = {
         id: 'b0101010-b010-b010-b010-b01010101010',
         clinic_id: 'b0101010-b010-b010-b010-b01010101010',
@@ -355,6 +415,12 @@ function InstituteFlowWrapper() {
       };
       setInstituteData(doctorData);
       document.documentElement.style.setProperty('--primary-color', doctorData.theme_color);
+      setLoading(false);
+      return;
+    }
+
+    if (qr_identifier === 'kishore-bhavana' && !selectedDoctor) {
+      document.documentElement.style.setProperty('--primary-color', '#0284c7');
       setLoading(false);
       return;
     }
@@ -412,10 +478,59 @@ function InstituteFlowWrapper() {
         setError('Institute not found or deactivated.');
       })
       .finally(() => setLoading(false));
-  }, [qr_identifier]);
+  }, [qr_identifier, selectedDoctor]);
 
   if (loading) return <div className="flex h-screen items-center justify-center">Loading...</div>;
   if (error) return <div className="flex h-screen items-center justify-center text-red-500">{error}</div>;
+
+  if (qr_identifier === 'kishore-bhavana' && !selectedDoctor) {
+    return (
+      <div className="min-h-screen bg-gray-50 text-gray-900 font-sans max-w-md mx-auto shadow-xl relative overflow-hidden flex flex-col justify-center p-6">
+        <div className="bg-white rounded-3xl p-6 shadow-md border border-gray-100 text-center space-y-6">
+          <div className="w-16 h-16 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center mx-auto">
+            <Stethoscope className="w-8 h-8" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Kishore Bhavana Clinic</h2>
+            <p className="text-xs text-gray-500 mt-1">Please select which doctor you consulted today</p>
+          </div>
+          <div className="space-y-3">
+            <button
+              onClick={() => setSelectedDoctor('kishore')}
+              className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-sky-50 rounded-2xl border border-gray-200 hover:border-sky-300 transition-all text-left"
+            >
+              <div className="flex items-center space-x-3.5">
+                <div className="w-11 h-11 rounded-xl bg-sky-600 text-white flex items-center justify-center font-bold text-sm">
+                  DK
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-gray-800">Dr. Kishore</h4>
+                  <p className="text-xs text-gray-500">Orthopedician</p>
+                </div>
+              </div>
+              <span className="text-sky-600 font-semibold text-xs">Select &rarr;</span>
+            </button>
+            <button
+              onClick={() => setSelectedDoctor('bhavana')}
+              className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-pink-50 rounded-2xl border border-gray-200 hover:border-pink-300 transition-all text-left"
+            >
+              <div className="flex items-center space-x-3.5">
+                <div className="w-11 h-11 rounded-xl bg-pink-600 text-white flex items-center justify-center font-bold text-sm">
+                  DB
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-gray-800">Dr. Bhavana</h4>
+                  <p className="text-xs text-gray-500">Pediatrician</p>
+                </div>
+              </div>
+              <span className="text-pink-600 font-semibold text-xs">Select &rarr;</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!instituteData) return null;
 
   return (
