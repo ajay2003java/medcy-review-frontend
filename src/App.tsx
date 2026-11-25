@@ -47,9 +47,7 @@ function ClinicFlowWrapper() {
   const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
-<<<<<<< HEAD
     setImageError(false);
-=======
     // If it's Dr. Kishore or Dr. Bhavana
     if (qr_identifier === 'kishore' || qr_identifier === 'bhavana') {
       const isKishore = qr_identifier === 'kishore';
@@ -88,7 +86,6 @@ function ClinicFlowWrapper() {
       return;
     }
 
->>>>>>> 2b861d1 (kishorebhavanaclinic)
     // If it's a demo route, we mock the backend response instantly!
     if (qr_identifier?.startsWith('demo-')) {
       const categoryStr = qr_identifier.replace('demo-', '');
@@ -160,7 +157,7 @@ function ClinicFlowWrapper() {
       const colors: Record<string, string> = {
         'ivf': '#ec4899', 'dermatology': '#8b5cf6', 'gynecology': '#f43f5e', 'dentist': '#0ea5e9', 'general-hospital': '#10b981', 'laboratory': '#10b981'
       };
-      
+
       const mockData: ClinicContextData = {
         id: `demo-${categoryStr}`,
         name: demoCategory === 'Laboratory' ? 'Demo Diagnostic Laboratory' : `Demo ${demoCategory} Clinic`,
@@ -170,7 +167,7 @@ function ClinicFlowWrapper() {
         questions: demoQuestions[demoCategory] || demoQuestions['General Hospital'],
         services: demoServices[demoCategory] || demoServices['General Hospital']
       };
-      
+
       setClinicData(mockData);
       document.documentElement.style.setProperty('--primary-color', mockData.theme_color);
       setLoading(false);
@@ -224,12 +221,12 @@ function ClinicFlowWrapper() {
               "Other"
             ]
           };
-          
+
           // Match the enum value string (e.g., "IVF" or "General Hospital")
           let matchedCategory = data.category;
           data.services = fallbackServices[matchedCategory] || fallbackServices['General Hospital'];
         }
-        
+
         setClinicData(data);
         // Apply theme color
         document.documentElement.style.setProperty('--primary-color', data.theme_color);
@@ -249,9 +246,9 @@ function ClinicFlowWrapper() {
       {/* Brand Header */}
       {clinicData.logo_url && !imageError ? (
         <div className="w-full bg-white shadow-sm z-10 border-b border-gray-100/60 overflow-hidden rounded-b-3xl">
-          <img 
-            src={clinicData.logo_url} 
-            alt={clinicData.name} 
+          <img
+            src={clinicData.logo_url}
+            alt={clinicData.name}
             className="w-full h-auto max-h-48 object-contain p-4"
             onError={() => setImageError(true)}
           />
@@ -274,7 +271,7 @@ function ClinicFlowWrapper() {
       <div className="flex-1 p-6 flex flex-col relative z-0">
         {step === 'feedback' && (
           clinicData.category === 'Laboratory' ? (
-            <LaboratoryFeedbackForm 
+            <LaboratoryFeedbackForm
               clinicId={clinicData.id}
               clinicName={clinicData.name}
               questions={clinicData.questions}
@@ -285,7 +282,7 @@ function ClinicFlowWrapper() {
               }}
             />
           ) : (
-            <FeedbackForm 
+            <FeedbackForm
               clinicId={clinicData.id}
               clinicName={clinicData.name}
               doctorName={clinicData.doctor_name || undefined}
@@ -320,9 +317,7 @@ function InstituteFlowWrapper() {
   const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
-<<<<<<< HEAD
     setImageError(false);
-=======
     // If it's Dr. Kishore or Dr. Bhavana
     if (qr_identifier === 'kishore' || qr_identifier === 'bhavana') {
       const isKishore = qr_identifier === 'kishore';
@@ -364,7 +359,6 @@ function InstituteFlowWrapper() {
       return;
     }
 
->>>>>>> 2b861d1 (kishorebhavanaclinic)
     // If it's a demo route for laboratory
     if (qr_identifier === 'demo-laboratory') {
       const mockData = {
@@ -429,10 +423,10 @@ function InstituteFlowWrapper() {
       {/* Brand Header */}
       {instituteData.logo_url && !imageError ? (
         <div className="w-full bg-white shadow-sm z-10 border-b border-gray-100/60 overflow-hidden rounded-b-3xl">
-          <img 
-            src={instituteData.logo_url} 
-            alt={instituteData.name} 
-            className="w-full h-auto max-h-48 object-contain p-4" 
+          <img
+            src={instituteData.logo_url}
+            alt={instituteData.name}
+            className="w-full h-auto max-h-48 object-contain p-4"
             onError={() => setImageError(true)}
           />
         </div>
@@ -454,7 +448,7 @@ function InstituteFlowWrapper() {
       <div className="flex-1 p-6 flex flex-col relative z-0">
         {step === 'feedback' && (
           instituteData.category === 'Laboratory' ? (
-            <LaboratoryFeedbackForm 
+            <LaboratoryFeedbackForm
               instituteId={instituteData.id}
               clinicName={instituteData.name}
               isInstitute={true}
@@ -466,7 +460,7 @@ function InstituteFlowWrapper() {
               }}
             />
           ) : instituteData.isDoctorClinic || instituteData.doctor_name ? (
-            <FeedbackForm 
+            <FeedbackForm
               clinicId={instituteData.clinic_id || instituteData.id}
               clinicName={instituteData.name}
               doctorName={instituteData.doctor_name}
@@ -481,7 +475,7 @@ function InstituteFlowWrapper() {
               }}
             />
           ) : (
-            <InstituteFeedbackForm 
+            <InstituteFeedbackForm
               instituteId={instituteData.id}
               category={instituteData.category}
               services={instituteData.services || []}
