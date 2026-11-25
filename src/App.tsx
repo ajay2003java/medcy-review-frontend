@@ -8,7 +8,7 @@ import ResultScreen from './pages/ResultScreen';
 import DemoPage from './pages/DemoPage';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Stethoscope } from 'lucide-react';
+import { Stethoscope, UserCheck, Baby } from 'lucide-react';
 
 // A simple global state for the clinic flow context
 export interface ClinicContextData {
@@ -252,44 +252,64 @@ function ClinicFlowWrapper() {
   if (qr_identifier === 'kishore-bhavana' && !selectedDoctor) {
     return (
       <div className="min-h-screen bg-gray-50 text-gray-900 font-sans max-w-md mx-auto shadow-xl relative overflow-hidden flex flex-col justify-center p-6">
-        <div className="bg-white rounded-3xl p-6 shadow-md border border-gray-100 text-center space-y-6">
-          <div className="w-16 h-16 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center mx-auto">
-            <Stethoscope className="w-8 h-8" />
+        <div className="bg-white rounded-3xl p-6 shadow-md border border-gray-100 space-y-4">
+          <div className="flex items-center space-x-3 mb-2">
+            <div className="w-10 h-10 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center">
+              <Stethoscope className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-gray-900 leading-tight">Kishore Bhavana Clinic</h2>
+              <p className="text-xs text-gray-500">Select doctor form to continue</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-xl font-bold text-gray-900">Kishore Bhavana Clinic</h2>
-            <p className="text-xs text-gray-500 mt-1">Please select which doctor you consulted today</p>
-          </div>
-          <div className="space-y-3">
+
+          <div className="space-y-3 mt-4">
+            {/* Doctor 1: Dr. Kishore */}
             <button
+              type="button"
               onClick={() => setSelectedDoctor('kishore')}
-              className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-sky-50 rounded-2xl border border-gray-200 hover:border-sky-300 transition-all text-left"
+              className="w-full group flex items-center justify-between p-4 bg-gray-50 hover:bg-sky-50 rounded-2xl border border-gray-200 hover:border-sky-300 transition-all duration-200 text-left"
             >
               <div className="flex items-center space-x-3.5">
-                <div className="w-11 h-11 rounded-xl bg-sky-600 text-white flex items-center justify-center font-bold text-sm">
-                  DK
+                <div className="w-12 h-12 rounded-xl bg-sky-600 text-white flex items-center justify-center shadow-xs">
+                  <UserCheck className="w-6 h-6" />
                 </div>
-                <div>
-                  <h4 className="text-sm font-bold text-gray-800">Dr. Kishore</h4>
-                  <p className="text-xs text-gray-500">Orthopedician</p>
+                <div className="text-left">
+                  <h4 className="text-base font-bold text-gray-800 group-hover:text-sky-700 transition-colors">
+                    Dr. Kishore
+                  </h4>
+                  <span className="inline-block text-xs font-semibold px-2 py-0.5 bg-sky-100 text-sky-700 rounded-md">
+                    Orthopedician
+                  </span>
                 </div>
               </div>
-              <span className="text-sky-600 font-semibold text-xs">Select &rarr;</span>
+              <span className="text-sm font-semibold text-sky-600 group-hover:translate-x-1 transition-transform">
+                Select &rarr;
+              </span>
             </button>
+
+            {/* Doctor 2: Dr. Bhavana */}
             <button
+              type="button"
               onClick={() => setSelectedDoctor('bhavana')}
-              className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-pink-50 rounded-2xl border border-gray-200 hover:border-pink-300 transition-all text-left"
+              className="w-full group flex items-center justify-between p-4 bg-gray-50 hover:bg-rose-50 rounded-2xl border border-gray-200 hover:border-rose-300 transition-all duration-200 text-left"
             >
               <div className="flex items-center space-x-3.5">
-                <div className="w-11 h-11 rounded-xl bg-pink-600 text-white flex items-center justify-center font-bold text-sm">
-                  DB
+                <div className="w-12 h-12 rounded-xl bg-rose-500 text-white flex items-center justify-center shadow-xs">
+                  <Baby className="w-6 h-6" />
                 </div>
-                <div>
-                  <h4 className="text-sm font-bold text-gray-800">Dr. Bhavana</h4>
-                  <p className="text-xs text-gray-500">Pediatrician</p>
+                <div className="text-left">
+                  <h4 className="text-base font-bold text-gray-800 group-hover:text-rose-700 transition-colors">
+                    Dr. Bhavana
+                  </h4>
+                  <span className="inline-block text-xs font-semibold px-2 py-0.5 bg-rose-100 text-rose-700 rounded-md">
+                    Pediatrician
+                  </span>
                 </div>
               </div>
-              <span className="text-pink-600 font-semibold text-xs">Select &rarr;</span>
+              <span className="text-sm font-semibold text-rose-600 group-hover:translate-x-1 transition-transform">
+                Select &rarr;
+              </span>
             </button>
           </div>
         </div>
@@ -318,9 +338,20 @@ function ClinicFlowWrapper() {
           </div>
           <h1 className="text-xl font-bold text-center tracking-tight">{clinicData.name}</h1>
           {clinicData.doctor_name && (
-            <p className="text-xs text-white/90 font-medium mt-1">
-              {clinicData.doctor_name} • {clinicData.specialty}
-            </p>
+            <div className="text-center mt-1">
+              <p className="text-xs text-white/90 font-medium">
+                {clinicData.doctor_name} • {clinicData.specialty}
+              </p>
+              {qr_identifier === 'kishore-bhavana' && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedDoctor(null)}
+                  className="text-[11px] text-white/80 hover:text-white underline font-medium mt-1 inline-block"
+                >
+                  ← Select different doctor
+                </button>
+              )}
+            </div>
           )}
         </div>
       )}
@@ -486,44 +517,64 @@ function InstituteFlowWrapper() {
   if (qr_identifier === 'kishore-bhavana' && !selectedDoctor) {
     return (
       <div className="min-h-screen bg-gray-50 text-gray-900 font-sans max-w-md mx-auto shadow-xl relative overflow-hidden flex flex-col justify-center p-6">
-        <div className="bg-white rounded-3xl p-6 shadow-md border border-gray-100 text-center space-y-6">
-          <div className="w-16 h-16 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center mx-auto">
-            <Stethoscope className="w-8 h-8" />
+        <div className="bg-white rounded-3xl p-6 shadow-md border border-gray-100 space-y-4">
+          <div className="flex items-center space-x-3 mb-2">
+            <div className="w-10 h-10 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center">
+              <Stethoscope className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-gray-900 leading-tight">Kishore Bhavana Clinic</h2>
+              <p className="text-xs text-gray-500">Select doctor form to continue</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-xl font-bold text-gray-900">Kishore Bhavana Clinic</h2>
-            <p className="text-xs text-gray-500 mt-1">Please select which doctor you consulted today</p>
-          </div>
-          <div className="space-y-3">
+
+          <div className="space-y-3 mt-4">
+            {/* Doctor 1: Dr. Kishore */}
             <button
+              type="button"
               onClick={() => setSelectedDoctor('kishore')}
-              className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-sky-50 rounded-2xl border border-gray-200 hover:border-sky-300 transition-all text-left"
+              className="w-full group flex items-center justify-between p-4 bg-gray-50 hover:bg-sky-50 rounded-2xl border border-gray-200 hover:border-sky-300 transition-all duration-200 text-left"
             >
               <div className="flex items-center space-x-3.5">
-                <div className="w-11 h-11 rounded-xl bg-sky-600 text-white flex items-center justify-center font-bold text-sm">
-                  DK
+                <div className="w-12 h-12 rounded-xl bg-sky-600 text-white flex items-center justify-center shadow-xs">
+                  <UserCheck className="w-6 h-6" />
                 </div>
-                <div>
-                  <h4 className="text-sm font-bold text-gray-800">Dr. Kishore</h4>
-                  <p className="text-xs text-gray-500">Orthopedician</p>
+                <div className="text-left">
+                  <h4 className="text-base font-bold text-gray-800 group-hover:text-sky-700 transition-colors">
+                    Dr. Kishore
+                  </h4>
+                  <span className="inline-block text-xs font-semibold px-2 py-0.5 bg-sky-100 text-sky-700 rounded-md">
+                    Orthopedician
+                  </span>
                 </div>
               </div>
-              <span className="text-sky-600 font-semibold text-xs">Select &rarr;</span>
+              <span className="text-sm font-semibold text-sky-600 group-hover:translate-x-1 transition-transform">
+                Select &rarr;
+              </span>
             </button>
+
+            {/* Doctor 2: Dr. Bhavana */}
             <button
+              type="button"
               onClick={() => setSelectedDoctor('bhavana')}
-              className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-pink-50 rounded-2xl border border-gray-200 hover:border-pink-300 transition-all text-left"
+              className="w-full group flex items-center justify-between p-4 bg-gray-50 hover:bg-rose-50 rounded-2xl border border-gray-200 hover:border-rose-300 transition-all duration-200 text-left"
             >
               <div className="flex items-center space-x-3.5">
-                <div className="w-11 h-11 rounded-xl bg-pink-600 text-white flex items-center justify-center font-bold text-sm">
-                  DB
+                <div className="w-12 h-12 rounded-xl bg-rose-500 text-white flex items-center justify-center shadow-xs">
+                  <Baby className="w-6 h-6" />
                 </div>
-                <div>
-                  <h4 className="text-sm font-bold text-gray-800">Dr. Bhavana</h4>
-                  <p className="text-xs text-gray-500">Pediatrician</p>
+                <div className="text-left">
+                  <h4 className="text-base font-bold text-gray-800 group-hover:text-rose-700 transition-colors">
+                    Dr. Bhavana
+                  </h4>
+                  <span className="inline-block text-xs font-semibold px-2 py-0.5 bg-rose-100 text-rose-700 rounded-md">
+                    Pediatrician
+                  </span>
                 </div>
               </div>
-              <span className="text-pink-600 font-semibold text-xs">Select &rarr;</span>
+              <span className="text-sm font-semibold text-rose-600 group-hover:translate-x-1 transition-transform">
+                Select &rarr;
+              </span>
             </button>
           </div>
         </div>

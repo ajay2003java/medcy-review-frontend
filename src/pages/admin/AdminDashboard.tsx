@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { LayoutDashboard, Users, MessageSquare, Plus, Link as LinkIcon, Building2, FlaskConical, GraduationCap, Stethoscope, Copy, ExternalLink, Check, UserCheck } from 'lucide-react';
+import { LayoutDashboard, Users, MessageSquare, Plus, Link as LinkIcon, Building2, FlaskConical, GraduationCap, Stethoscope, Copy, ExternalLink, Check, UserCheck, QrCode, X } from 'lucide-react';
 
 interface Clinic {
   id: string;
@@ -77,6 +77,7 @@ export default function AdminDashboard() {
     theme_color: '#0ea5e9'
   });
   const [copiedDoc, setCopiedDoc] = useState<string | null>(null);
+  const [selectedQrModal, setSelectedQrModal] = useState<{ name: string; url: string } | null>(null);
   const [createdClinic, setCreatedClinic] = useState<Clinic | null>(null);
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -341,32 +342,68 @@ export default function AdminDashboard() {
                       <td className="p-4 text-gray-600">
                         <div>{clinic.category}</div>
                         {isKishoreBhavana && (
-                          <div className="text-xs text-gray-400 mt-0.5">Orthopedics &amp; Pediatrics</div>
+                          <div className="text-xs text-sky-700 font-medium mt-0.5">Specialties: Orthopedics &amp; Pediatrics</div>
                         )}
                       </td>
                       <td className="p-4">
                         {isKishoreBhavana ? (
-                          <div className="space-y-1.5">
+                          <div className="space-y-2">
+                            {/* Single Patient-Facing Review URL */}
                             <div className="flex items-center space-x-2">
-                              <span className="text-xs font-semibold text-gray-700 w-24">Dr. Kishore:</span>
-                              <a href="/review/kishore" target="_blank" rel="noreferrer" className="text-primary hover:underline flex items-center text-xs font-medium">
-                                <LinkIcon className="h-3.5 w-3.5 mr-1" />
-                                {window.location.origin}/review/kishore
+                              <a 
+                                href="/review/kishore-bhavana" 
+                                target="_blank" 
+                                rel="noreferrer" 
+                                className="text-primary hover:underline flex items-center text-sm font-semibold"
+                              >
+                                <LinkIcon className="h-4 w-4 mr-1 shrink-0" />
+                                {window.location.origin}/review/kishore-bhavana
                               </a>
                             </div>
+
+                            {/* One Copy Link and One QR Code for the single shared URL */}
                             <div className="flex items-center space-x-2">
-                              <span className="text-xs font-semibold text-gray-700 w-24">Dr. Bhavana:</span>
-                              <a href="/review/bhavana" target="_blank" rel="noreferrer" className="text-primary hover:underline flex items-center text-xs font-medium">
-                                <LinkIcon className="h-3.5 w-3.5 mr-1" />
-                                {window.location.origin}/review/bhavana
-                              </a>
+                              <button
+                                type="button"
+                                onClick={() => copyDoctorLink(`${window.location.origin}/review/kishore-bhavana`, 'kb-table-copy')}
+                                className="text-xs bg-gray-50 hover:bg-gray-100 text-gray-700 font-medium px-2.5 py-1.5 rounded-lg border border-gray-200 flex items-center transition-colors shadow-xs"
+                              >
+                                {copiedDoc === 'kb-table-copy' ? <Check className="w-3.5 h-3.5 mr-1 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
+                                {copiedDoc === 'kb-table-copy' ? 'Copied' : 'Copy Link'}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setSelectedQrModal({ name: clinic.name, url: `${window.location.origin}/review/kishore-bhavana` })}
+                                className="text-xs bg-sky-50 hover:bg-sky-100 text-sky-700 font-medium px-2.5 py-1.5 rounded-lg border border-sky-200 flex items-center transition-colors shadow-xs"
+                              >
+                                <QrCode className="w-3.5 h-3.5 mr-1" />
+                                QR Code
+                              </button>
+                            </div>
+
+                            {/* Admin-only direct preview links */}
+                            <div className="text-[11px] text-gray-400 flex items-center space-x-2 pt-1 border-t border-gray-100">
+                              <span>Admin preview:</span>
+                              <a href="/review/kishore" target="_blank" rel="noreferrer" className="text-gray-600 hover:text-sky-600 underline">Dr. Kishore</a>
+                              <span>•</span>
+                              <a href="/review/bhavana" target="_blank" rel="noreferrer" className="text-gray-600 hover:text-rose-600 underline">Dr. Bhavana</a>
                             </div>
                           </div>
                         ) : (
-                          <a href={`/review/${clinic.qr_identifier}`} target="_blank" rel="noreferrer" className="text-primary hover:underline flex items-center text-sm font-medium">
-                            <LinkIcon className="h-4 w-4 mr-1" />
-                            {window.location.origin}/review/{clinic.qr_identifier}
-                          </a>
+                          <div className="flex items-center space-x-3">
+                            <a href={`/review/${clinic.qr_identifier}`} target="_blank" rel="noreferrer" className="text-primary hover:underline flex items-center text-sm font-medium">
+                              <LinkIcon className="h-4 w-4 mr-1" />
+                              {window.location.origin}/review/{clinic.qr_identifier}
+                            </a>
+                            <button
+                              type="button"
+                              onClick={() => setSelectedQrModal({ name: clinic.name, url: `${window.location.origin}/review/${clinic.qr_identifier}` })}
+                              className="text-xs text-gray-500 hover:text-gray-700 p-1 rounded hover:bg-gray-100"
+                              title="View QR Code"
+                            >
+                              <QrCode className="w-4 h-4" />
+                            </button>
+                          </div>
                         )}
                       </td>
                     </tr>
@@ -432,12 +469,10 @@ export default function AdminDashboard() {
                   )}
                 </div>
 
-                {formData.category !== 'Kishore Bhavana Clinic' && (
-                  <LogoUrlInput 
-                    value={formData.logo_url} 
-                    onChange={val => setFormData({...formData, logo_url: val})} 
-                  />
-                )}
+                <LogoUrlInput 
+                  value={formData.logo_url} 
+                  onChange={val => setFormData({...formData, logo_url: val})} 
+                />
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Google Review URL</label>
@@ -490,6 +525,51 @@ export default function AdminDashboard() {
                       </span>
                     </div>
 
+                    {/* Single Shared Patient-Facing Review URL */}
+                    <div className="bg-sky-50/50 p-4 rounded-2xl border border-sky-200 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+                          Single Patient QR / Review Form Link
+                        </label>
+                        <span className="text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-semibold border border-emerald-200">
+                          Single Link for Both Doctors
+                        </span>
+                      </div>
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-xl border border-sky-100 shadow-xs">
+                        <span className="font-mono text-primary font-bold text-xs truncate">
+                          {window.location.origin}/review/kishore-bhavana
+                        </span>
+                        <div className="flex items-center space-x-2 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => copyDoctorLink(`${window.location.origin}/review/kishore-bhavana`, 'kb-form-copy')}
+                            className="text-xs bg-gray-50 hover:bg-gray-100 text-gray-700 font-medium px-3 py-1.5 rounded-lg border border-gray-200 flex items-center transition-colors shadow-xs"
+                          >
+                            {copiedDoc === 'kb-form-copy' ? <Check className="w-3.5 h-3.5 mr-1 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
+                            {copiedDoc === 'kb-form-copy' ? 'Copied' : 'Copy Link'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedQrModal({ name: 'Kishore Bhavana Clinic', url: `${window.location.origin}/review/kishore-bhavana` })}
+                            className="text-xs bg-sky-50 hover:bg-sky-100 text-sky-700 font-medium px-3 py-1.5 rounded-lg border border-sky-200 flex items-center transition-colors shadow-xs"
+                          >
+                            <QrCode className="w-3.5 h-3.5 mr-1" /> QR Code
+                          </button>
+                          <a
+                            href="/review/kishore-bhavana"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-xs bg-sky-600 hover:bg-sky-700 text-white font-medium px-3 py-1.5 rounded-lg flex items-center transition-colors shadow-xs"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5 mr-1" /> Preview Form
+                          </a>
+                        </div>
+                      </div>
+                      <p className="text-[11px] text-gray-500">
+                        Patients open this single link or scan the QR code to select their consulting doctor and submit their review.
+                      </p>
+                    </div>
+
                     {/* Doctor 1: Dr. Kishore */}
                     <div className="bg-sky-50/70 border border-sky-200 rounded-2xl p-4 space-y-3">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -503,21 +583,13 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <button 
-                            type="button"
-                            onClick={() => copyDoctorLink(`${window.location.origin}/review/kishore`, 'kishore')}
-                            className="text-xs bg-white hover:bg-gray-50 text-gray-700 font-medium px-3 py-1.5 rounded-lg border border-gray-200 flex items-center shadow-xs"
-                          >
-                            {copiedDoc === 'kishore' ? <Check className="w-3.5 h-3.5 mr-1 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
-                            {copiedDoc === 'kishore' ? 'Copied' : 'Copy Link'}
-                          </button>
                           <a 
                             href="/review/kishore" 
                             target="_blank" 
                             rel="noreferrer"
                             className="text-xs bg-sky-600 hover:bg-sky-700 text-white font-medium px-3 py-1.5 rounded-lg flex items-center shadow-xs"
                           >
-                            <ExternalLink className="w-3.5 h-3.5 mr-1" /> Preview Form
+                            <ExternalLink className="w-3.5 h-3.5 mr-1" /> Admin Preview
                           </a>
                         </div>
                       </div>
@@ -559,21 +631,13 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <button 
-                            type="button"
-                            onClick={() => copyDoctorLink(`${window.location.origin}/review/bhavana`, 'bhavana')}
-                            className="text-xs bg-white hover:bg-gray-50 text-gray-700 font-medium px-3 py-1.5 rounded-lg border border-gray-200 flex items-center shadow-xs"
-                          >
-                            {copiedDoc === 'bhavana' ? <Check className="w-3.5 h-3.5 mr-1 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
-                            {copiedDoc === 'bhavana' ? 'Copied' : 'Copy Link'}
-                          </button>
                           <a 
                             href="/review/bhavana" 
                             target="_blank" 
                             rel="noreferrer"
                             className="text-xs bg-pink-600 hover:bg-pink-700 text-white font-medium px-3 py-1.5 rounded-lg flex items-center shadow-xs"
                           >
-                            <ExternalLink className="w-3.5 h-3.5 mr-1" /> Preview Form
+                            <ExternalLink className="w-3.5 h-3.5 mr-1" /> Admin Preview
                           </a>
                         </div>
                       </div>
@@ -817,6 +881,57 @@ export default function AdminDashboard() {
           </div>
         )}
       </div>
+
+      {/* QR Code Modal */}
+      {selectedQrModal && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-200 relative">
+            <button 
+              type="button" 
+              onClick={() => setSelectedQrModal(null)} 
+              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <div className="w-12 h-12 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center mx-auto">
+              <QrCode className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-900 text-lg">{selectedQrModal.name}</h3>
+              <p className="text-xs text-gray-500 mt-0.5">Scan with phone camera to open review form</p>
+            </div>
+            <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-center">
+              <img 
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(selectedQrModal.url)}`} 
+                alt="QR Code" 
+                className="w-48 h-48 rounded-xl shadow-xs" 
+              />
+            </div>
+            <div className="bg-gray-100 p-2.5 rounded-xl text-xs font-mono text-gray-700 truncate">
+              {selectedQrModal.url}
+            </div>
+            <div className="flex space-x-2">
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(selectedQrModal.url);
+                  alert("Link copied to clipboard!");
+                }}
+                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center transition-colors"
+              >
+                <Copy className="w-3.5 h-3.5 mr-1.5" /> Copy Link
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedQrModal(null)}
+                className="flex-1 bg-primary text-white font-semibold py-2.5 rounded-xl text-xs hover:bg-primary/90 transition-colors"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
