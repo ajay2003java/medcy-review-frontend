@@ -152,7 +152,7 @@ export default function FeedbackForm({
 
         // Equal opportunity: always provide google_url
         const gUrl = (clinicId === 'kishore' || clinicId === 'bhavana')
-          ? "https://search.google.com/local/writereview?placeid=ChIJ_kishore_bhavana_clinic"
+          ? "https://www.google.com/maps/search/?api=1&query=Kishore+Bhavana+Clinic"
           : "https://g.page/r/demo";
 
         onComplete({

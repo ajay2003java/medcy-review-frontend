@@ -421,7 +421,7 @@ function InstituteFlowWrapper() {
         category: isKishore ? 'Orthopedics' : 'Pediatrics',
         theme_color: '#0284c7',
         logo_url: null,
-        google_review_url: 'https://search.google.com/local/writereview?placeid=ChIJ_kishore_bhavana_clinic',
+        google_review_url: 'https://www.google.com/maps/search/?api=1&query=Kishore+Bhavana+Clinic',
         isDoctorClinic: true,
         questions: isKishore ? [
           "Were you satisfied with Dr. Kishore's orthopedic consultation and treatment plan?",

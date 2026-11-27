@@ -87,7 +87,7 @@ export default function AdminDashboard() {
         name: 'Kishore Bhavana Clinic',
         logo_url: '',
         category: 'Kishore Bhavana Clinic',
-        google_review_url: 'https://search.google.com/local/writereview?placeid=ChIJ_kishore_bhavana_clinic',
+        google_review_url: 'https://www.google.com/maps/search/?api=1&query=Kishore+Bhavana+Clinic',
         theme_color: '#0284c7'
       });
     } else {
@@ -95,7 +95,7 @@ export default function AdminDashboard() {
         ...formData,
         category: val,
         name: formData.name === 'Kishore Bhavana Clinic' ? '' : formData.name,
-        google_review_url: formData.google_review_url === 'https://search.google.com/local/writereview?placeid=ChIJ_kishore_bhavana_clinic' ? '' : formData.google_review_url,
+        google_review_url: formData.google_review_url === 'https://www.google.com/maps/search/?api=1&query=Kishore+Bhavana+Clinic' ? '' : formData.google_review_url,
         theme_color: formData.theme_color === '#0284c7' ? '#0ea5e9' : formData.theme_color
       });
     }
